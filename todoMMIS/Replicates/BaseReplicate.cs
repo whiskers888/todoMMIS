@@ -1,45 +1,17 @@
-﻿using System.Reflection;
-using todoMMIS.Contexts;
-using todoMMIS.Models;
+﻿using WebUI.Contexts;
+using WebUI.EFModels;
 
-namespace todoMMIS.Replicates
+namespace WebUI.Replicates
 {
     public class BaseReplicate
     {
-        public ApplicationContext AppContext { get; set; }
-        public EFBaseModel Context { get; set; }
-        public int Id { get;  }
-        public bool IsAvailable { get; }
-
-        public BaseReplicate(ApplicationContext appContext, EFBaseModel context)
+        EFBaseModel Context { get; set; }
+        protected ApplicationContext App { get; }
+        public BaseReplicate(ApplicationContext _app, EFBaseModel _context)
         {
-            this.AppContext = appContext;
-            this.Context = context;
-            this.IsAvailable = true;
+            App = _app;
+            Context = _context;
         }
-        public bool Update(Dictionary<string, dynamic> model)
-        {
-            bool hasChanges = false;
-            foreach( var pair in model){
-                foreach(var item in this.GetType().GetFields()) {
-                    if( item.Name == pair.Key & this.GetType().GetField(pair.Key) != pair.Value){
-                        hasChanges = true;
-                        this.GetType().GetProperty(pair.Key).SetValue(pair.Key, pair.Value);
-                    }
-                }
-            }
-            this.AppContext.CreateDbContext().SaveChanges();
-            return hasChanges;
-        }
-        public void Delete()
-        {
-            //???
-            this.AppContext.CreateDbContext().Remove(this);
-        }
-        public void Save(){
-            this.AppContext.CreateDbContext().SaveChanges();
-        }
-
-
+        public int Id => Context.Id;
     }
 }

@@ -1,18 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using todoMMIS.Models;
+using WebUI.EFModels;
 
-
-namespace todoMMIS.Contexts
+namespace WebUI.Contexts
 {
-    public class DBContext: DbContext
+    public class DBContext : DbContext
     {
-        public DbSet<EFTodoItem> TodoItems { get; set; }
+        public DbSet<EFTodo> Todos { get; set; }
 
-        public DbSet<EFUser> User { get; set; }
         public DBContext(string cnnString)
         {
             ConnectionString = cnnString;
+/*            Database.EnsureDeleted();
+            Database.EnsureCreated();*/
         }
 
         public string ConnectionString { get; }

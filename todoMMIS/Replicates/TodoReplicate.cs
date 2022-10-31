@@ -1,16 +1,20 @@
-﻿using todoMMIS.Contexts;
-using todoMMIS.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using WebUI.Contexts;
+using WebUI.EFModels;
 
-namespace todoMMIS.Replicates
+namespace WebUI.Replicates
 {
-    public class TodoReplicate:BaseReplicate
+    public class TodoReplicate : BaseReplicate
     {
-        public ApplicationContext AppContext { get; }
-        public EFTodoItem Model { get; set; }
-        public TodoReplicate(ApplicationContext appContext, EFTodoItem model) : base(appContext, model)
+        EFTodo Context { get; set; }
+        public TodoReplicate(ApplicationContext app, EFTodo _context) : base(app, _context)
         {
-            AppContext = appContext;
-            Model = model;
+            Context = _context;
         }
+
+        public string Name => Context.Name;
     }
 }

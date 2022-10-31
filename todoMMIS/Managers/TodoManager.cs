@@ -1,21 +1,18 @@
 ﻿using System;
-using todoMMIS.Contexts;
-using todoMMIS.Models;
-using todoMMIS.Replicates;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using WebUI.Contexts;
+using WebUI.EFModels;
+using WebUI.Replicates;
 
-namespace todoMMIS.Managers
+namespace WebUI.Managers
 {
-    public class TodoManager:BaseManager
+    public class TodoManager : BaseManager<TodoReplicate, EFTodo>
     {
-        public ApplicationContext AppContext { get; }
-        public TodoReplicate TodoReplicate { get; set; }
-        public EFTodoItem TodoItem { get; set; }
-        public TodoManager(ApplicationContext app) : base(app, replicate: TodoReplicate, model: EFTodoItem)
+        public TodoManager(ApplicationContext app) : base(app)
         {
-            AppContext = app;
 
         }
-
-        
     }
 }
