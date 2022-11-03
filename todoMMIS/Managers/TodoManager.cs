@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebUI.Contexts;
-using WebUI.EFModels;
-using WebUI.Replicates;
+using todoMMIS.Contexts;
+using todoMMIS.Models;
+using todoMMIS.Replicates;
 
-namespace WebUI.Managers
+namespace todoMMIS.Managers
 {
     public class TodoManager : BaseManager<TodoReplicate, EFTodo>
     {

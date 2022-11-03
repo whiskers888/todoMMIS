@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using WebUI.EFModels;
+using todoMMIS.Models;
 
-namespace WebUI.Contexts
+namespace todoMMIS.Contexts
 {
     public class DBContext : DbContext
     {

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/*using Microsoft.AspNetCore.Mvc;
 using System;
 using todoMMIS.Contexts;
 using todoMMIS.Models;
@@ -7,7 +7,7 @@ namespace todoMMIS.Controllers
 {
     public class AuthController : BaseController
     {
-        public AuthController (ApplicationContext _appContext) : base(_appContext) {   }
+        public AuthController(ApplicationContext _appContext) : base(_appContext) { }
         [HttpPost("[controller]/[action]")]
         public JsonResult SignIn(string login, string password, bool remember = false)
         {
@@ -15,14 +15,14 @@ namespace todoMMIS.Controllers
             {
                 dynamic result = GetCommon();
 
-                EFUser user = dbc.User.FirstOrDefault(user => user.Username == login && user.Hash == _appContext.GetHash(password));
+                EFUser user = dbc.User.FirstOrDefault(user => user.Login == login && user.Hash == _appContext.GetHash(password));
 
                 if (user != null)
                 {
                     user.Hash = _appContext.GetHash(Guid.NewGuid().ToString());
                     dbc.SaveChanges();
 
-                    result.user = user.Username;
+                    result.user = user.Login;
                     result.remember = remember;
 
                     _appContext.AddUser(user);
@@ -37,3 +37,4 @@ namespace todoMMIS.Controllers
 
     }
 }
+*/

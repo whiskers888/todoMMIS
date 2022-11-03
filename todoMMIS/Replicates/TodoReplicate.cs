@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using WebUI.Contexts;
-using WebUI.EFModels;
+using todoMMIS.Contexts;
+using todoMMIS.Models;
 
-namespace WebUI.Replicates
+namespace todoMMIS.Replicates
 {
     public class TodoReplicate : BaseReplicate
     {
@@ -15,6 +15,21 @@ namespace WebUI.Replicates
             Context = _context;
         }
 
-        public string Name => Context.Name;
+        public string TaskDescription
+        {
+            get => Context.TaskDescription;
+            set => Context.TaskDescription = value;
+        }
+        public string UserId
+        {
+            get => Context.UserId;
+            set => Context.UserId = value;
+        }
+        public string IsComplete
+        {
+            get => Context.TaskDescription;
+            set => Context.TaskDescription = value;
+        }
+        
     }
 }

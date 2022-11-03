@@ -1,7 +1,7 @@
-﻿using WebUI.Contexts;
-using WebUI.EFModels;
+﻿using todoMMIS.Contexts;
+using todoMMIS.Models;
 
-namespace WebUI.Replicates
+namespace todoMMIS.Replicates
 {
     public class BaseReplicate
     {
@@ -13,5 +13,24 @@ namespace WebUI.Replicates
             Context = _context;
         }
         public int Id => Context.Id;
+        public bool IsDeleted
+        {
+            get => Context.IsDeleted;
+            set => Context.IsDeleted = value;
+        }
+
+        public bool Update(dynamic model)
+        {
+            foreach(var key in GetType().GetFields())
+            {
+                if (model[key] != null && GetType().GetField(key.ToString()).GetValue(this) != model[key])
+                {
+                    // Если ID невозможно поменять надо проверить на геттеры и сеттеры
+                    GetType().GetField(key.ToString()).SetValue(this,model[key]);
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
