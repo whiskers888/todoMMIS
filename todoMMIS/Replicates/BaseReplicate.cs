@@ -13,31 +13,31 @@ namespace todoMMIS.Replicates
 
         public BaseReplicate(ApplicationContext appContext, EFBaseModel context)
         {
-            this.AppContext = appContext;
-            this.Context = context;
-            this.IsAvailable = true;
+            AppContext = appContext;
+            Context = context;
+            IsAvailable = true;
         }
         public bool Update(Dictionary<string, dynamic> model)
         {
             bool hasChanges = false;
             foreach( var pair in model){
-                foreach(var item in this.GetType().GetFields()) {
-                    if( item.Name == pair.Key & this.GetType().GetField(pair.Key) != pair.Value){
+                foreach(var item in GetType().GetFields()) {
+                    if( item.Name == pair.Key & GetType().GetField(pair.Key) != pair.Value){
                         hasChanges = true;
-                        this.GetType().GetProperty(pair.Key).SetValue(pair.Key, pair.Value);
+                        GetType().GetProperty(pair.Key).SetValue(pair.Key, pair.Value);
                     }
                 }
             }
-            this.AppContext.CreateDbContext().SaveChanges();
+            AppContext.CreateDbContext().SaveChanges();
             return hasChanges;
         }
         public void Delete()
         {
             //???
-            this.AppContext.CreateDbContext().Remove(this);
+            AppContext.CreateDbContext().Remove(this);
         }
         public void Save(){
-            this.AppContext.CreateDbContext().SaveChanges();
+            AppContext.CreateDbContext().SaveChanges();
         }
 
 

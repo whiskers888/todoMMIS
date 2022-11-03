@@ -36,7 +36,7 @@ namespace todoMMIS.Contexts
         public string GetHash(string input)
         {
             var tmpSource = Encoding.UTF8.GetBytes(input);
-            var hash = new MD5CryptoServiceProvider().ComputeHash(tmpSource);
+            byte[] hash = new MD5CryptoServiceProvider().ComputeHash(tmpSource);
             return Convert.ToBase64String(hash);
         }
         

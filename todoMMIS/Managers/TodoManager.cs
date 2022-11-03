@@ -5,12 +5,12 @@ using todoMMIS.Replicates;
 
 namespace todoMMIS.Managers
 {
-    public class TodoManager:BaseManager
+    public class TodoManager:BaseManager<TodoReplicate,EFTodo>
     {
         public ApplicationContext AppContext { get; }
-        public TodoReplicate TodoReplicate { get; set; }
-        public EFTodoItem TodoItem { get; set; }
-        public TodoManager(ApplicationContext app) : base(app, replicate: TodoReplicate, model: EFTodoItem)
+        public TodoReplicate Replicate { get; set; }
+        public EFTodo TodoItem { get; set; }
+        public TodoManager(ApplicationContext app) : base(app)
         {
             AppContext = app;
 

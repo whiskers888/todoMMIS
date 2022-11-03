@@ -4,11 +4,11 @@ using todoMMIS.Replicates;
 
 namespace todoMMIS.Managers
 {
-    public class UsersManager:BaseManager
+    public class UsersManager
     {
         private ApplicationContext AppContext { get; }
         private List<UserContext> Users { get; set; }
-        public UsersManager(ApplicationContext appContext, TodoReplicate replicate, EFTodoItem model) : base(appContext, replicate, model)
+        public UsersManager(ApplicationContext appContext)
         {
             AppContext = appContext;
             Users = new List<UserContext>();
@@ -44,7 +44,7 @@ namespace todoMMIS.Managers
 
         public UserContext GetUser(string token)
         {
-           return Users.FirstOrDefault(user => user.Token == token);
+            return Users.FirstOrDefault(user => user.Token == token);
         }
 
     }

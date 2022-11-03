@@ -7,7 +7,7 @@ namespace todoMMIS.Contexts
 {
     public class DBContext: DbContext
     {
-        public DbSet<EFTodoItem> TodoItems { get; set; }
+        public DbSet<EFTodo> TodoItems { get; set; }
 
         public DbSet<EFUser> User { get; set; }
         public DBContext(string cnnString)

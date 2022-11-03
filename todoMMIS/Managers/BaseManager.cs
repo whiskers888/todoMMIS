@@ -7,49 +7,41 @@ using todoMMIS.Replicates;
 
 namespace todoMMIS.Managers
 {
-    public class BaseManager
+    public class BaseManager<TReplicate, TModel> where TModel : EFBaseModel where TReplicate : BaseReplicate
     {
         public ApplicationContext AppContext { get;  }
-        public BaseReplicate Replicate { get; set; }
-        public EFBaseModel Model { get; set; }
-        public List<BaseReplicate>? Items { get; set; } 
+        public TReplicate Replicate { get; set; }
+        public TModel Model { get; set; }
+        public List<BaseReplicate> Items { get; set; } 
         public List<BaseReplicate> UpdateItems { get; set; }
         public bool hasUpdates { get; set; }
 
-        public BaseManager(ApplicationContext appContext,  BaseReplicate replicate, EFBaseModel model )
+        public BaseManager(ApplicationContext appContext)
         {
-            this.AppContext = appContext;
-            this.Replicate = replicate;
-            this.Model = model;
-            this.Items = new List<BaseReplicate> ();
-            this.UpdateItems = new List<BaseReplicate> { };
-            this.hasUpdates = false;
-            this.Read();
+            AppContext = appContext;
+            Items = new List<BaseReplicate> ();
+            UpdateItems = new List<BaseReplicate> { };
+            hasUpdates = false;
+            Read();
 
         }
 
         public void Read()
         {
-            this.Items?.Clear();
+            Items?.Clear();
+            /* При переносе сделать через DBContext*/
             foreach (EFBaseModel item in Model.GetType().GetFields().Select(field => field.GetValue(Model)))
             {
-                this.Items.Add(new BaseReplicate(AppContext, item));
+                Items?.Add(new BaseReplicate(AppContext, item));
             };
         }
 
         public BaseReplicate? Create(Dictionary<string, dynamic> model)
         {
-            try
-            {
-                BaseReplicate item = new BaseReplicate( AppContext, GetObject<EFBaseModel>(model));
-                this.Items.Add(item);
-                this.hasUpdates = true;
-                return item;
-            }
-            catch
-            {
-                return null;
-            }
+            BaseReplicate item = new( AppContext, GetObject<EFBaseModel>(model));
+            Items.Add(item);
+            hasUpdates = true;
+            return item;
         }
 
         public BaseReplicate? Update(Dictionary<string, dynamic> model, bool untracked = false)
@@ -79,8 +71,8 @@ namespace todoMMIS.Managers
 
         public bool Delete( int id){
             try{
-                BaseReplicate _item = this.Get(id);
-                foreach (BaseReplicate item in this.Items){
+                BaseReplicate? _item = Get(id);
+                foreach (BaseReplicate item in Items){
                     if (item.Context.Id == _item.Context.Id)
                     {
                         Items.Remove(item);
@@ -111,21 +103,21 @@ namespace todoMMIS.Managers
             return null;
         }
 
-        public List<BaseReplicate> getUpdated(bool include_unavailable = false)
+        public List<BaseReplicate> GetUpdated(bool include_unavailable = false)
         {
             List<BaseReplicate> Result = null;
             foreach (BaseReplicate item in UpdateItems)
             {
                 if (item.IsAvailable & include_unavailable)
                 {
-                    Result.Append(item);
+                    Result?.Append(item);
                 }
             }
             UpdateItems.Clear();
             return Result;
         }
 
-        public List <BaseReplicate> getAll()
+        public List <BaseReplicate> GetAll()
         {
             return Items;
         }
@@ -133,22 +125,21 @@ namespace todoMMIS.Managers
         // Я вроде знаю реализацию этой ебучей сериализации но пока в падлу ибо не протестить, чуть позже сделать!!!!!!!
         public List <BaseReplicate> GetJson( bool reverse = true)
         {
-            List 
             return null;
         }
         //
 
         public List<BaseReplicate> GetAvaliable()
         {
-            List<BaseReplicate> result = null;
+            List<BaseReplicate> Result = null;
             foreach(BaseReplicate item in Items){
                 if (item.IsAvailable){
-                    result.Append(item);
+                    Result.Append(item);
                 }
             }
-            return result;
+            return Result;
         }
-        public void save()
+        public void Save()
         {
             foreach( BaseReplicate item in Items)
             {
@@ -156,7 +147,7 @@ namespace todoMMIS.Managers
             }
         }
         
-        T GetObject<T>(Dictionary<string, dynamic> dict)
+        static T GetObject<T>(Dictionary<string, dynamic> dict)
         {
             Type type = typeof(T);
             var obj = Activator.CreateInstance(type);

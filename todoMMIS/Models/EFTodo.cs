@@ -1,6 +1,6 @@
 ﻿namespace todoMMIS.Models
 {
-    public class EFTodoItem : EFBaseModel
+    public class EFTodo : EFBaseModel
     {
 
         public string TaskDescription { get; set; }
