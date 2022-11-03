@@ -4,31 +4,20 @@ using todoMMIS.Replicates;
 
 namespace todoMMIS.Managers
 {
-    public class UsersManager
+    public class UsersManager:BaseManager<UserReplicate, EFUser>
     {
-        private ApplicationContext AppContext { get; }
-        private List<UserContext> Users { get; set; }
-        public UsersManager(ApplicationContext appContext)
+        private List<UserReplicate> Users { get; set; }
+        public UsersManager(ApplicationContext appContext) : base(appContext)
         {
-            AppContext = appContext;
-            Users = new List<UserContext>();
+            Users = new List<UserReplicate>();
         }
 
-        public UserContext? Authorize(string login, string password)
+        public UserReplicate? Authorize(string login, string password)
         {
-            DBContext db = AppContext.CreateDbContext();
-            EFUser user = db.User.FirstOrDefault(x => x.Username == login & x.Hash == AppContext.GetHash(password));
-            if (user != null)
-            {
-                user.Token = AppContext.GenerateToken();
-                UserContext user_context = new(AppContext, user);
-                AddUser(user_context);
-                return user_context;
-            }
             return null;
         }
 
-        public void AddUser(UserContext user)
+        public void AddUser(UserReplicate user)
         {
             if (Users.Contains(user) == false)
             {
@@ -36,15 +25,15 @@ namespace todoMMIS.Managers
             }
         }
 
-        public void RemoveUser(UserContext user)
+        public void RemoveUser(UserReplicate user)
         {
             if (Users.Contains(user))
                 Users.Remove(user);
         }
 
-        public UserContext GetUser(string token)
+        public UserReplicate GetUser(string token)
         {
-            return Users.FirstOrDefault(user => user.Token == token);
+           return Users.FirstOrDefault(user => user.Token == token);
         }
 
     }

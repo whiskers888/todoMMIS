@@ -30,7 +30,7 @@ namespace todoMMIS.Controllers
         }
         internal JsonResult Execute(Func<DBContext, JsonResult> action, string expMessage)
         {
-            DBContext dbContext = _appContext.CreateDbContext();
+            DBContext dbContext = _appContext.CreateDBContext();
 
             try { return action(dbContext); }
             catch { return Send(expMessage); }

@@ -1,45 +1,38 @@
-﻿using System.Security.Cryptography;
-using System.Text;
+﻿using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using todoMMIS.Managers;
-using todoMMIS.Models;
 
 namespace todoMMIS.Contexts
 {
     public class ApplicationContext
     {
-        public IConfiguration Config { get; }
-
-        public UsersManager UserManager { get; }
-        public TodoManager TodoManager { get;  }
-        
         public ApplicationContext(IConfiguration config)
         {
+            Version = "0.0.0.1";
+            Title = "TodoMMIS";
             Config = config;
-            TodoManager = new TodoManager(this);
-            UserManager = new UsersManager(this);
-
+            Initialize();
         }
 
-        public DBContext CreateDbContext()
+        public void Initialize()
+        {
+            TodoManager = new TodoManager(this);
+        }
+
+        public TodoManager TodoManager { get; set; }
+
+        public string Version { get; }
+
+        public string Title { get; }
+
+        public IConfiguration Config { get; }
+
+        public DBContext CreateDBContext()
         {
             return new DBContext(Config.GetConnectionString("DefaultConnection"));
         }
-
-        public string GenerateToken()
-        {
-            byte[] time = BitConverter.GetBytes(DateTime.UtcNow.ToBinary());
-            byte[] key = Guid.NewGuid().ToByteArray();
-            string token = Convert.ToBase64String(time.Concat(key).ToArray());
-            return token;
-        }
-
-        public string GetHash(string input)
-        {
-            var tmpSource = Encoding.UTF8.GetBytes(input);
-            byte[] hash = new MD5CryptoServiceProvider().ComputeHash(tmpSource);
-            return Convert.ToBase64String(hash);
-        }
-        
-
     }
 }
