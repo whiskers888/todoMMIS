@@ -12,8 +12,20 @@ namespace todoMMIS.Managers
             Users = new List<UserReplicate>();
         }
 
-        public UserReplicate? Authorize(string login, string password)
+        public UserReplicate? Authorize(string login, string password, bool remember)
         {
+            
+            EFUser user = DBContext.Users.FirstOrDefault(x => x.Username == login & x.Hash == AppContext.GetHash(password));
+            if (user != null)
+            {
+                user.Token = AppContext.GenerateToken();
+                UserReplicate replicate = new(AppContext, user);
+                if (remember)
+                {
+                    AddUser(replicate);
+                }
+                return replicate;
+            }
             return null;
         }
 

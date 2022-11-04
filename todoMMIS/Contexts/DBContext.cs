@@ -6,7 +6,7 @@ namespace todoMMIS.Contexts
     public class DBContext : DbContext
     {
         public DbSet<EFTodo> Todos { get; set; }
-
+        public DbSet<EFUser> Users { get; set; }
         public DBContext(string cnnString)
         {
             ConnectionString = cnnString;

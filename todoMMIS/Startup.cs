@@ -13,11 +13,12 @@ namespace todoMMIS
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc(mvc => { mvc.EnableEndpointRouting = false; });
             services.AddSingleton<ApplicationContext>();
+            services.AddControllers();
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -26,11 +27,10 @@ namespace todoMMIS
             {
                 app.UseHsts();
             }
-
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
+
         }
     }
 }

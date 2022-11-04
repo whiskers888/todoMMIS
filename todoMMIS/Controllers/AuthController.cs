@@ -1,40 +1,31 @@
-﻿/*using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using Microsoft.AspNetCore.Mvc;
 using todoMMIS.Contexts;
-using todoMMIS.Models;
+using todoMMIS.Replicates;
 
 namespace todoMMIS.Controllers
 {
     public class AuthController : BaseController
     {
         public AuthController(ApplicationContext _appContext) : base(_appContext) { }
+
+
         [HttpPost("[controller]/[action]")]
         public JsonResult SignIn(string login, string password, bool remember = false)
         {
-            return Execute((dbc) =>
-            {
-                dynamic result = GetCommon();
+            var res = GetCommon();
+            UserReplicate user = ApplicationContext.UserManager.Authorize(login, password, remember);
+            res.item = user;
+            return Send(true, res);
+        }
 
-                EFUser user = dbc.User.FirstOrDefault(user => user.Login == login && user.Hash == _appContext.GetHash(password));
-
-                if (user != null)
-                {
-                    user.Hash = _appContext.GetHash(Guid.NewGuid().ToString());
-                    dbc.SaveChanges();
-
-                    result.user = user.Login;
-                    result.remember = remember;
-
-                    _appContext.AddUser(user);
-
-                    return Send("Успешная авторизация");
-                }
-
-                return Send("Неверные логин или пароль");
-
-            }, "Ошибка авторизации");
+        [HttpPost("[controller]/[action]")]
+        public JsonResult SignUp(dynamic request)
+        {
+            ApplicationContext.UserManager.Create(request);
+            var res = GetCommon();
+            
+            return Send(true, res);
         }
 
     }
 }
-*/

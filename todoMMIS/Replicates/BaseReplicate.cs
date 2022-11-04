@@ -25,12 +25,17 @@ namespace todoMMIS.Replicates
             {
                 if (model[key] != null && GetType().GetField(key.ToString()).GetValue(this) != model[key])
                 {
-                    // Если ID невозможно поменять надо проверить на геттеры и сеттеры
+                    // Если ID будет пробовать поменять то надо проверить поле на сеттеры
                     GetType().GetField(key.ToString()).SetValue(this,model[key]);
                     return true;
                 }
             }
             return false;
+        }
+
+        public void Delete()
+        {
+            IsDeleted = true;
         }
     }
 }

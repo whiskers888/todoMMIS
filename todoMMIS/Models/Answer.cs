@@ -7,8 +7,8 @@
 
         public object Data { get; set; }
 
-        public DateTime Datetime { get; set; }
+        public string Datetime { get; set; }
 
-        public string Status { get; set; }
+        public bool Status { get; set; }
     }
 }

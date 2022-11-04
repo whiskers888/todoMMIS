@@ -7,11 +7,11 @@ namespace todoMMIS.Controllers
 {
     public class BaseController: Controller
     {
-        public ApplicationContext _appContext { get; }
+        public ApplicationContext ApplicationContext { get; }
 
         public BaseController(ApplicationContext appContext)
         {
-            _appContext = appContext;
+            ApplicationContext = appContext;
         }
         internal dynamic GetCommon()
         {
@@ -20,20 +20,14 @@ namespace todoMMIS.Controllers
             return common;
         }
 
-        internal JsonResult Send(string message)
+        internal JsonResult Send(bool status,object data)
         {
             return Json(new Answer()
             {
-                Message = message,
-                Datetime = DateTime.Now,
-            });
-        }
-        internal JsonResult Execute(Func<DBContext, JsonResult> action, string expMessage)
-        {
-            DBContext dbContext = _appContext.CreateDBContext();
-
-            try { return action(dbContext); }
-            catch { return Send(expMessage); }
+                Status = status,
+                Data = data,
+                Datetime = DateTime.Now.ToString("u"),
+            }); ; ;
         }
     }
 }
