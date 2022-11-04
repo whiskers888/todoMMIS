@@ -24,7 +24,6 @@ namespace todoMMIS.Controllers
         {
             return Json(new Answer()
             {
-                Status = status,
                 Data = data,
                 Datetime = DateTime.Now.ToString("u"),
             }); ; ;

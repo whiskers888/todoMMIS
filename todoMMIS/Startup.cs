@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using todoMMIS.Contexts;
+﻿using todoMMIS.Contexts;
 
 namespace todoMMIS
 {
@@ -13,9 +12,9 @@ namespace todoMMIS
         public IConfiguration Configuration { get; }
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddControllers();
             services.AddMvc(mvc => { mvc.EnableEndpointRouting = false; });
             services.AddSingleton<ApplicationContext>();
-            services.AddControllers();
         }
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -30,7 +29,15 @@ namespace todoMMIS
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
+            app.UseMvc(routes =>
+            {
+                routes.MapRoute(
+                   name: "default",
+                   template: "{controller=App}/{action=Index}/{id?}");
 
+                routes.MapRoute("NotFound", "{*url}",
+                    new { controller = "App", action = "RedirectToMain" });
+            });
         }
     }
 }

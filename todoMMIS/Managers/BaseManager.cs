@@ -1,11 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using todoMMIS.Models;
 using todoMMIS.Contexts;
 using todoMMIS.Replicates;
-using Newtonsoft.Json;
+using XAct;
 
 namespace todoMMIS.Managers
 {
@@ -21,9 +18,9 @@ namespace todoMMIS.Managers
             Read();
         }
 
-        private readonly List<TReplicate> replicates;
+        public readonly List<TReplicate> replicates;
 
-        private void Read()
+        public void Read()
         {
             foreach (var prop in DBContext.GetType().GetProperties())
             {
@@ -39,24 +36,25 @@ namespace todoMMIS.Managers
 
         public TReplicate[] Items => replicates.ToArray();
 
-        public bool Create(dynamic model)
+        public virtual TReplicate Create(dynamic model)
         {
             try
             {
                 // Получаем модель и репликейт из JSON
-                TModel EFModel = JsonConvert.DeserializeObject<TModel>(model);
+                TModel EFModel = Newtonsoft.Json.JsonConvert.DeserializeObject<TModel>(model.ToString());
                 TReplicate replicate = (TReplicate)Activator.CreateInstance(typeof(TReplicate), AppContext, EFModel);
                 
                 //Добавляем репликейт в свой список, а модель в БД и сохраняем
                 replicates.Add(replicate);
                 DBContext.Add(EFModel);
                 DBContext.SaveChanges();
-                return true;
+                return replicate;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return false;
+                Console.WriteLine(ex.InnerException.Message);
+                return null;
             }
         }
 
@@ -69,7 +67,8 @@ namespace todoMMIS.Managers
                 replicate.Update(model);
 
                 // Обновляем модель в БД
-                TModel EFModel = JsonConvert.DeserializeObject<TModel>(model);
+                TModel EFModel = Newtonsoft.Json.JsonConvert.DeserializeObject<TModel>(model);
+               
                 DBContext.Entry(EFModel).State = EntityState.Modified;
                 DBContext.SaveChanges();
                 return true;

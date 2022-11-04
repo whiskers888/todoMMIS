@@ -37,12 +37,12 @@ namespace todoMMIS.Replicates
             get => Context.Email;
             set => Context.Email = value;
         }
-        public string Hash
+        public string Password
         {
-            get => Context.Hash;
-            set => Context.Hash = value;
+            get => Context.Password;
+            set => Context.Password = App.GetHash(value);
         }
-        public string Token
+        public string? Token
         {
             get => Context.Token;
             set => Context.Token = value;

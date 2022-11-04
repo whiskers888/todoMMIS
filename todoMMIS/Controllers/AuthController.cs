@@ -10,7 +10,7 @@ namespace todoMMIS.Controllers
 
 
         [HttpPost("[controller]/[action]")]
-        public JsonResult SignIn(string login, string password, bool remember = false)
+        public JsonResult SignIn([FromBody] string login, string password, bool remember = false)
         {
             var res = GetCommon();
             UserReplicate user = ApplicationContext.UserManager.Authorize(login, password, remember);
@@ -19,12 +19,22 @@ namespace todoMMIS.Controllers
         }
 
         [HttpPost("[controller]/[action]")]
-        public JsonResult SignUp(dynamic request)
+        public JsonResult SignUp([FromBody] object data)
         {
-            ApplicationContext.UserManager.Create(request);
+            UserReplicate user = ApplicationContext.UserManager.Create(data);
             var res = GetCommon();
+            if(user != null)
+            {
+                res.item = user;
+                res.status = true;
+            }
+            else
+            {
+                res.item = "Ошибка создания аккаунта";
+                res.status = false;
+            }
             
-            return Send(true, res);
+            return Send(res.status, res);
         }
 
     }
