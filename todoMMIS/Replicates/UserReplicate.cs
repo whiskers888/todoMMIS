@@ -40,7 +40,7 @@ namespace todoMMIS.Replicates
         public string Password
         {
             get => Context.Password;
-            set => Context.Password = App.GetHash(value);
+            set => Context.Password = value;
         }
         public string? Token
         {

@@ -1,4 +1,6 @@
-﻿using todoMMIS.Contexts;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using todoMMIS.Contexts;
 
 namespace todoMMIS
 {
@@ -13,9 +15,25 @@ namespace todoMMIS
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddAuthorization();
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = AuthOptions.ISSUER,
+                    ValidateAudience = true,
+                    ValidAudience = AuthOptions.AUDIENCE,
+                    ValidateLifetime = true,
+                    IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                    ValidateIssuerSigningKey = true
+                };
+            });
+
             services.AddMvc(mvc => { mvc.EnableEndpointRouting = false; });
             services.AddSingleton<ApplicationContext>();
-        }
+            
+        }  
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -29,6 +47,10 @@ namespace todoMMIS
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

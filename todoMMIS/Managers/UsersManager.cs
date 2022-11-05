@@ -22,7 +22,7 @@ namespace todoMMIS.Managers
                 EFUser user = DBContext.Users.FirstOrDefault(x => x.Username == login & x.Password == AppContext.GetHash(password));
                 if (user != null )
                 {
-                    user.Token = AppContext.GenerateToken();
+                    user.Token = AppContext.GenerateToken(user.Username);
                     DBContext.SaveChanges();
                     UserReplicate replicate = new(AppContext, user);
                     if (remember)
@@ -49,7 +49,7 @@ namespace todoMMIS.Managers
                 if (replicates.FirstOrDefault(user => user.Username == replicate.Username) == null)
                 {
                     EFUser.Password = AppContext.GetHash(EFUser.Password);
-                    EFUser.Token = AppContext.GenerateToken();
+                    EFUser.Token = AppContext.GenerateToken(EFUser.Username);
                     AddUser(replicate);
                     //Добавляем репликейт в свой список, а модель в БД и сохраняем
                     replicates.Add(replicate);

@@ -4,7 +4,7 @@
     {
 
         public object Data { get; set; }
-
+        public bool Status { get; set; }
         public string Datetime { get; set; }
     }
 }

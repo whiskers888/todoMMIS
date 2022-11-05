@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using todoMMIS.Contexts;
 
 namespace todoMMIS.Controllers
 {
-    public class TodoController:BaseController
+    public class TodoController : BaseController
     {
-        public TodoController(ApplicationContext appContext) : base(appContext){ }
+        public TodoController(ApplicationContext appContext) : base(appContext) { }
 
+        [Authorize]
         [HttpGet("[controller]/[action]")]
         public JsonResult Test()
         {
