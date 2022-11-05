@@ -21,11 +21,22 @@ namespace todoMMIS.Controllers
         [HttpGet("[controller]/[action]")]
         public JsonResult GetAll()
         {
-            string access_token = HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7);
-            var user = ApplicationContext.DecodeToken(access_token);
-
+            var user = ApplicationContext.DecodeToken(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
+            var todos= ApplicationContext.TodoManager.GetAll(user);
             dynamic res = GetCommon();
-            res.items = user;
+            res.items = todos;
+            return Send(true, res);
+        }
+
+        [Authorize]
+        [HttpPost("[controller]/[action]")]
+        public JsonResult Get([FromBody] dynamic data)
+        {
+            dynamic Data = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(data.ToString());
+            var user = ApplicationContext.DecodeToken(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
+            var todos = ApplicationContext.TodoManager.Get(Convert.ToUInt64(Data["Id"]), user);
+            dynamic res = GetCommon();
+            res.items = todos;
             return Send(true, res);
         }
     }
