@@ -16,5 +16,17 @@ namespace todoMMIS.Controllers
             res.items = ApplicationContext.TodoManager.Items;
             return Send(true, res);
         }
+
+        [Authorize]
+        [HttpGet("[controller]/[action]")]
+        public JsonResult GetAll()
+        {
+            string access_token = HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7);
+            var user = ApplicationContext.DecodeToken(access_token);
+
+            dynamic res = GetCommon();
+            res.items = user;
+            return Send(true, res);
+        }
     }
 }

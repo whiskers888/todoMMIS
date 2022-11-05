@@ -20,10 +20,10 @@ namespace todoMMIS.Replicates
             get => Context.TaskDescription;
             set => Context.TaskDescription = value;
         }
-        public string UserId
+        public string User
         {
-            get => Context.UserId;
-            set => Context.UserId = value;
+            get => Context.User;
+            set => Context.User = value;
         }
         public string IsComplete
         {

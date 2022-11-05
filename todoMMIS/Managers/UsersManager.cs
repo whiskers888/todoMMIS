@@ -1,12 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using todoMMIS.Contexts;
+﻿using todoMMIS.Contexts;
 using todoMMIS.Models;
 using todoMMIS.Replicates;
-using XAct.Users;
 
 namespace todoMMIS.Managers
 {
-    public class UsersManager:BaseManager<UserReplicate, EFUser>
+    public class UsersManager : BaseManager<UserReplicate, EFUser>
     {
         private List<UserReplicate> Users { get; set; }
         public UsersManager(ApplicationContext appContext) : base(appContext)
@@ -20,7 +18,7 @@ namespace todoMMIS.Managers
             try
             {
                 EFUser user = DBContext.Users.FirstOrDefault(x => x.Username == login & x.Password == AppContext.GetHash(password));
-                if (user != null )
+                if (user != null)
                 {
                     user.Token = AppContext.GenerateToken(user.Username);
                     DBContext.SaveChanges();
@@ -29,10 +27,10 @@ namespace todoMMIS.Managers
                     {
                         AddUser(replicate);
                     }
-                     return replicate;
+                    return replicate;
                 }
                 return null;
-            } catch(Exception ex)
+            } catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.InnerException.Message);
@@ -58,7 +56,7 @@ namespace todoMMIS.Managers
                     return replicate;
                 }
                 return null;
-            } catch(Exception ex)
+            } catch (Exception ex)
             {
                 Console.WriteLine(ex.InnerException.Message);
                 return null;
@@ -68,7 +66,7 @@ namespace todoMMIS.Managers
         {
             if (Users.Contains(user) == false)
             {
-                _ = Users.Append(user);
+                Users.Add(user);
             }
         }
 
@@ -78,7 +76,11 @@ namespace todoMMIS.Managers
                 Users.Remove(user);
         }
 
-        public UserReplicate GetUser(string token) => Users.FirstOrDefault(user => user.Token == token);
+        public UserReplicate GetUser(string token)
+        {
+            var user = Users.FirstOrDefault(user => user.Token == token);
+            return user;
+        } 
 
     }
 }

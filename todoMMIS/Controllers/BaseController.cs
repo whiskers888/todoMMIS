@@ -8,7 +8,6 @@ namespace todoMMIS.Controllers
     public class BaseController: Controller
     {
         public ApplicationContext ApplicationContext { get; }
-
         public BaseController(ApplicationContext appContext)
         {
             ApplicationContext = appContext;
@@ -24,7 +23,7 @@ namespace todoMMIS.Controllers
         {
             return Json(new Answer()
             {
-                status = status
+                Status = status,
                 Data = data,
                 Datetime = DateTime.Now.ToString("u"),
             }); ; ;

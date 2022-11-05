@@ -2,7 +2,6 @@
 using todoMMIS.Models;
 using todoMMIS.Contexts;
 using todoMMIS.Replicates;
-using XAct;
 
 namespace todoMMIS.Managers
 {
@@ -36,7 +35,7 @@ namespace todoMMIS.Managers
 
         public TReplicate[] Items => replicates.ToArray();
 
-        public virtual TReplicate Create(dynamic model)
+        public virtual TReplicate? Create(dynamic model)
         {
             try
             {

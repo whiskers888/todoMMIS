@@ -10,7 +10,7 @@ namespace todoMMIS.Contexts
         public DBContext(string cnnString)
         {
             ConnectionString = cnnString;
-           /* Database.EnsureDeleted();
+            /*Database.EnsureDeleted();
             Database.EnsureCreated();*/
         }
 

@@ -1,16 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.OAuth;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using todoMMIS.Managers;
-using XAct.Users;
 using XSystem.Security.Cryptography;
 
 namespace todoMMIS.Contexts
@@ -31,8 +23,8 @@ namespace todoMMIS.Contexts
             UserManager = new UsersManager(this);
         }
 
-        public TodoManager TodoManager { get; set; }
-        public UsersManager UserManager { get; set; }
+        public TodoManager? TodoManager { get; set; }
+        public UsersManager? UserManager { get; set; }
 
         public string Version { get; }
 
@@ -58,6 +50,21 @@ namespace todoMMIS.Contexts
 
             return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
+        public string DecodeToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var validations = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
+                ValidateIssuer = true,
+                ValidIssuer = AuthOptions.ISSUER,
+                ValidateAudience = true,
+                ValidAudience = AuthOptions.AUDIENCE,
+            };
+            var claims = handler.ValidateToken(token, validations, out _);
+            return claims.Identity.Name;
+        }
 
         public string GetHash(string input)
         {
@@ -72,6 +79,6 @@ namespace todoMMIS.Contexts
         public const string AUDIENCE = "MyAuthClient"; // потребитель токена
         const string KEY = "mysupersecret_secretkey!123";   // ключ для шифрации
         public static SymmetricSecurityKey GetSymmetricSecurityKey() =>
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
+            new(Encoding.UTF8.GetBytes(KEY));
     }
 }
