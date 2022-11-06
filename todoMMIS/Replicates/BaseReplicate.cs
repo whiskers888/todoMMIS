@@ -5,7 +5,7 @@ namespace todoMMIS.Replicates
 {
     public class BaseReplicate
     {
-        EFBaseModel Context { get; set; }
+        internal EFBaseModel Context { get; set; }
         protected ApplicationContext App { get; }
         public BaseReplicate(ApplicationContext _app, EFBaseModel _context)
         {
@@ -13,7 +13,7 @@ namespace todoMMIS.Replicates
             Context = _context;
         }
         public int Id => Context.Id;
-        public bool IsDeleted
+        public bool? IsDeleted
         {
             get => Context.IsDeleted;
             set => Context.IsDeleted = value;
@@ -21,21 +21,31 @@ namespace todoMMIS.Replicates
 
         public bool Update(dynamic model)
         {
-            foreach(var key in GetType().GetFields())
+            try
             {
-                if (model[key] != null && GetType().GetField(key.ToString()).GetValue(this) != model[key])
+                dynamic items = GetType().GetProperties();
+                foreach (var key in items)
                 {
-                    // Если ID будет пробовать поменять то надо проверить поле на сеттеры
-                    GetType().GetField(key.ToString()).SetValue(this,model[key]);
-                    return true;
+                    dynamic field = model.GetType().GetProperty(key.Name).GetValue(model);
+                    if (field != null && GetType().GetProperty(key.Name).GetValue(this) != field)
+                    {
+                        // Если ID будет пробовать поменять то надо проверить поле на сеттеры
+                        GetType().GetProperty(key.Name).SetValue(this, field);
+                    }
                 }
+                return true;
+            }catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
             }
-            return false;
+            
         }
 
         public void Delete()
         {
             IsDeleted = true;
+            
         }
     }
 }

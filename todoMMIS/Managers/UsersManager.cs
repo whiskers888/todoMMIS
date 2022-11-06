@@ -1,4 +1,5 @@
-﻿using todoMMIS.Contexts;
+﻿using Microsoft.EntityFrameworkCore;
+using todoMMIS.Contexts;
 using todoMMIS.Models;
 using todoMMIS.Replicates;
 
@@ -10,7 +11,6 @@ namespace todoMMIS.Managers
         public UsersManager(ApplicationContext appContext) : base(appContext)
         {
             Users = new List<UserReplicate>();
-            Read();
         }
 
         public UserReplicate? Authorize(string login, string password, bool remember = false)
@@ -34,26 +34,19 @@ namespace todoMMIS.Managers
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.InnerException.Message);
-                return null;
+                throw;
             }
         }
-        public override UserReplicate? Create(dynamic model)
+        public override UserReplicate? Create(EFUser User)
         {
             try
             {
-                EFUser EFUser = Newtonsoft.Json.JsonConvert.DeserializeObject<EFUser>(model.ToString());
-                UserReplicate replicate = (UserReplicate)Activator.CreateInstance(typeof(UserReplicate), AppContext, EFUser);
-
-                if (replicates.FirstOrDefault(user => user.Username == replicate.Username) == null)
+                if (replicates.FirstOrDefault(user => user.Username == User.Username) == null)
                 {
-                    EFUser.Password = AppContext.GetHash(EFUser.Password);
-                    EFUser.Token = AppContext.GenerateToken(EFUser.Username);
-                    AddUser(replicate);
-                    //Добавляем репликейт в свой список, а модель в БД и сохраняем
-                    replicates.Add(replicate);
-                    DBContext.Add(EFUser);
-                    DBContext.SaveChanges();
-                    return replicate;
+                    User.Password = AppContext.GetHash(User.Password);
+                    User.Token = AppContext.GenerateToken(User.Username);
+
+                    return base.Create(User);
                 }
                 return null;
             } catch (Exception ex)
@@ -66,20 +59,32 @@ namespace todoMMIS.Managers
         {
             if (Users.Contains(user) == false)
             {
-                Users.Add(user);
+                Users.Add(user);    
             }
         }
 
         public void RemoveUser(UserReplicate user)
         {
             if (Users.Contains(user))
-                Users.Remove(user);
+            {
+                replicates.Remove(user);
+                Users.Remove(user); 
+                DeleteToken(user.Username);
+            }  
+        }
+
+        public void DeleteToken(string username)
+        {
+            EFUser user = DBContext.Users.FirstOrDefault(x => x.Username == username);
+            user.Token = null;
+            DBContext.Entry(user).State = EntityState.Modified;
+                DBContext.SaveChanges();
         }
 
         public UserReplicate GetUser(string token)
         {
-            var user = Users.FirstOrDefault(user => user.Token == token);
-            return user;
+            UserReplicate User = Items.FirstOrDefault(User => User.Token == token);
+            return User;
         } 
 
     }

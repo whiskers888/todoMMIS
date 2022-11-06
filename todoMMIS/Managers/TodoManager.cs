@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using todoMMIS.Contexts;
+﻿using todoMMIS.Contexts;
 using todoMMIS.Models;
 using todoMMIS.Replicates;
-using XAct.Users;
 
 namespace todoMMIS.Managers
 {
     public class TodoManager : BaseManager<TodoReplicate, EFTodo>
     {
-        public TodoManager(ApplicationContext app) : base(app) 
-        {
-            
-        }
+        public TodoManager(ApplicationContext app) : base(app) { }
 
         public List<TodoReplicate> Todos { get; set; }
+
+        public override TodoReplicate? Create(EFTodo model)
+        {
+            return base.Create(model);
+        }
         public TodoReplicate? Get(int id, string username)
         {
             foreach (TodoReplicate item in replicates)

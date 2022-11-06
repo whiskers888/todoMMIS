@@ -2,6 +2,7 @@
 using todoMMIS.Models;
 using todoMMIS.Contexts;
 using todoMMIS.Replicates;
+using XAct.Users;
 
 namespace todoMMIS.Managers
 {
@@ -27,7 +28,10 @@ namespace todoMMIS.Managers
                 {
                     foreach (var item in items.ToArray())
                     {
-                        replicates.Add((TReplicate)Activator.CreateInstance(typeof(TReplicate), AppContext, item));
+                        if(item.IsDeleted == false)
+                        {
+                            replicates.Add((TReplicate)Activator.CreateInstance(typeof(TReplicate), AppContext, item));
+                        }
                     }
                 }
             }
@@ -35,14 +39,13 @@ namespace todoMMIS.Managers
 
         public TReplicate[] Items => replicates.ToArray();
 
-        public virtual TReplicate? Create(dynamic model)
+        public virtual TReplicate? Create(TModel EFModel)
         {
             try
             {
-                // Получаем модель и репликейт из JSON
-                TModel EFModel = Newtonsoft.Json.JsonConvert.DeserializeObject<TModel>(model.ToString());
+
                 TReplicate replicate = (TReplicate)Activator.CreateInstance(typeof(TReplicate), AppContext, EFModel);
-                
+
                 //Добавляем репликейт в свой список, а модель в БД и сохраняем
                 replicates.Add(replicate);
                 DBContext.Add(EFModel);
@@ -53,29 +56,27 @@ namespace todoMMIS.Managers
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.InnerException.Message);
-                return null;
+                throw;
             }
         }
 
-        public bool Update(dynamic model)
+        public TReplicate Update(TModel model)
         {
             try
             {
                 // Обновляем репликейт
-                TReplicate replicate = Get(model["id"]);
+                TReplicate replicate = Get(model.Id);
                 replicate.Update(model);
 
-                // Обновляем модель в БД
-                TModel EFModel = Newtonsoft.Json.JsonConvert.DeserializeObject<TModel>(model);
-               
-                DBContext.Entry(EFModel).State = EntityState.Modified;
+
+                /*DBContext.Entry(model).State = EntityState.Modified;*/
                 DBContext.SaveChanges();
-                return true;
+                return replicate;
 
             }catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return false;
+                throw;
             }
         }
 
@@ -85,7 +86,7 @@ namespace todoMMIS.Managers
             {
                 foreach (TReplicate replicate in Items)
                 {
-                    if (replicate.Id == id)
+                    if (replicate.Id == id )
                     {
                         return replicate;
                     }
@@ -94,36 +95,52 @@ namespace todoMMIS.Managers
             }catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return null;
+                throw;
             }
            
         }
 
-        public TReplicate[]? GetAll(int id)
+        public List<TReplicate>? GetAll(int id)
         {
             try
             {
-                return Items;
+                List<TReplicate> ListReplicate = new List<TReplicate>();
+                foreach(TReplicate replicate in Items)
+                {
+                    if (replicate.Id == id )
+                    {
+                        ListReplicate.Add(replicate);
+                    }
+                }
+                return ListReplicate;
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return null;
+                throw;
             }
 
         }
 
-        public bool Delete(dynamic model)
+        public TReplicate Delete(int id)
         {
             try
             {
-                TReplicate? replicate = Get(model["id"]);
-                replicate?.Delete();
-                return true;
+                foreach(TReplicate item in replicates)
+                {
+                    if(item.Id == id && item.IsDeleted == false)
+                    {
+                        item.Context.IsDeleted = true;
+                        Update((TModel)item.Context);
+                        replicates.Remove(item);
+                        return item;
+                    }
+                }
+                return null;
             }catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                return false;
+                throw;
             }
         }
 

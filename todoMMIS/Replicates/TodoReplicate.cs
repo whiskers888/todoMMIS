@@ -9,7 +9,7 @@ namespace todoMMIS.Replicates
 {
     public class TodoReplicate : BaseReplicate
     {
-        EFTodo Context { get; set; }
+        protected EFTodo Context { get; set; }
         public TodoReplicate(ApplicationContext app, EFTodo _context) : base(app, _context)
         {
             Context = _context;
@@ -25,10 +25,10 @@ namespace todoMMIS.Replicates
             get => Context.User;
             set => Context.User = value;
         }
-        public string IsComplete
+        public bool IsComplete
         {
-            get => Context.TaskDescription;
-            set => Context.TaskDescription = value;
+            get => Context.IsComplete;
+            set => Context.IsComplete = value;
         }
         
     }

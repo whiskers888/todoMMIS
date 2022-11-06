@@ -28,5 +28,12 @@ namespace todoMMIS.Controllers
                 Datetime = DateTime.Now.ToString("u"),
             }); ; ;
         }
+
+        internal JsonResult Exception( Exception ex) 
+        {
+            dynamic res = GetCommon();
+            res.Exception = ex.Message;
+            return Send(false, res);
+        }
     }
 }
