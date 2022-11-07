@@ -30,6 +30,29 @@ namespace todoMMIS.Replicates
             get => Context.IsComplete;
             set => Context.IsComplete = value;
         }
-        
+
+        public bool IsExpired
+        {
+            get => Context.IsExpired = DateTime.Now.ToLocalTime() >= DateExpired ? true : false;
+            set => Context.IsExpired = value;
+        }
+
+        public DateTime DateCreate
+        {
+            get => Context.DateCreate;
+            set => Context.DateCreate = value;
+        }
+
+        public DateTime DateExpired
+        {
+            get => Context.DateExpired;
+            set => Context.DateExpired = value;
+        }
+        public int Priority
+        {
+            get => Context.Priority;
+            set => Context.Priority = value;
+        }
+
     }
 }

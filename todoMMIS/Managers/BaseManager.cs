@@ -49,7 +49,7 @@ namespace todoMMIS.Managers
                 //Добавляем репликейт в свой список, а модель в БД и сохраняем
                 replicates.Add(replicate);
                 DBContext.Add(EFModel);
-                DBContext.SaveChanges();
+                int  a = DBContext.SaveChanges();
                 return replicate;
             }
             catch (Exception ex)

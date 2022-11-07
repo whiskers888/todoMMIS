@@ -13,7 +13,7 @@ namespace todoMMIS.Controllers
 
 
         [HttpPost("[controller]/[action]")]
-        public JsonResult SignIn([FromBody] dynamic data)
+        public JsonResult SignIn([FromBody] dynamic data, bool remember)
         {
             try
             {
@@ -34,9 +34,8 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                ApplicationContext.UserManager.Create(data);
-                UserReplicate user = ApplicationContext.UserManager.Authorize(data.Username, data.Password);
-                var res = GetCommon();
+                UserReplicate user = ApplicationContext.UserManager.Create(data);
+                var res = GetCommon();  
                 bool status;
                 if (user != null)
                 {

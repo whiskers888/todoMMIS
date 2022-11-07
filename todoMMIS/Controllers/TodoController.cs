@@ -23,6 +23,7 @@ namespace todoMMIS.Controllers
             try
             {
                 data.User = ApplicationContext.DecodeToken(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
+                data.DateCreate = DateTime.Now.ToLocalTime();
                 TodoReplicate todos = ApplicationContext.TodoManager.Create(data);
 
                 dynamic res = GetCommon();

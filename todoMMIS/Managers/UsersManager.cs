@@ -17,17 +17,16 @@ namespace todoMMIS.Managers
         {
             try
             {
-                EFUser user = DBContext.Users.FirstOrDefault(x => x.Username == login & x.Password == AppContext.GetHash(password));
+                UserReplicate user = Items.FirstOrDefault(x => x.Username == login & x.Password == AppContext.GetHash(password));
                 if (user != null)
                 {
                     user.Token = AppContext.GenerateToken(user.Username);
                     DBContext.SaveChanges();
-                    UserReplicate replicate = new(AppContext, user);
                     if (remember)
                     {
-                        AddUser(replicate);
+                        AddUser(user);
                     }
-                    return replicate;
+                    return user;
                 }
                 return null;
             } catch (Exception ex)
@@ -45,6 +44,7 @@ namespace todoMMIS.Managers
                 {
                     User.Password = AppContext.GetHash(User.Password);
                     User.Token = AppContext.GenerateToken(User.Username);
+                    
 
                     return base.Create(User);
                 }
