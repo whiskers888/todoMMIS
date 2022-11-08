@@ -47,5 +47,26 @@ namespace todoMMIS.Managers
                 return null;
             }
         }
+
+        public override TodoReplicate Update(EFTodo model)
+        {
+            model.DateCreate = null;
+            return base.Update(model);
+        }
+
+        public override TodoReplicate Delete(TodoReplicate replicate)
+        {
+            foreach(TodoReplicate item in replicates)
+            {
+                if(item.Id == replicate.Id && replicate.IsDeleted == false && item.User == replicate.User)
+                {
+                    item.Context.IsDeleted = true;
+                    Update((EFTodo)item.Context);
+                    replicates.Remove(item);
+                    return item;
+                }
+            }
+            return null;
+        }
     }
 }

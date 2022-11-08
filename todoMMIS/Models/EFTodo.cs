@@ -7,8 +7,8 @@
         public string User { get; set; }
         public bool IsComplete { get; set; }
         public bool IsExpired { get; set;}
-        public DateTime DateCreate { get; set; }
-        public DateTime DateExpired { get; set; }
+        public DateTime? DateCreate { get; set; }
+        public DateTime? DateExpired { get; set; }
         public int Priority { get; set; }
 
     }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using todoMMIS.Contexts;
 using todoMMIS.Models;
+using todoMMIS.Models.Новая_папка;
 using todoMMIS.Replicates;
 
 namespace todoMMIS.Controllers
@@ -17,10 +18,12 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                UserReplicate user = ApplicationContext.UserManager.GetUser(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
-                var res = GetCommon();
-                res.user = user;
-                return Send(true, res);
+                return Execute(GetToken(), (UserReplicate User) =>
+                {
+                    var res = GetCommon();
+                    res.user = User;
+                    return Send(true, res);
+                }, "Token is Invalid");
             }
             catch(Exception ex)
             {
@@ -35,17 +38,16 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                data.Username = null;
-                data.IsDeleted = null;
-                data.Token = null;
-                data.Password = null;
+                return Execute(GetToken(), (UserReplicate User) =>
+                {
+                    data.Id = User.Id;
 
-                UserReplicate user = ApplicationContext.UserManager.GetUser(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
-                data.Id = user.Id;
-                UserReplicate UpdateData = ApplicationContext.UserManager.Update(data);
-                dynamic res = GetCommon();
-                res.item = UpdateData;
-                return Send(true, res);
+                    UserReplicate UpdateData = ApplicationContext.UserManager.Update(data);
+
+                    dynamic res = GetCommon();
+                    res.item = UpdateData;
+                    return Send(true, res);
+                }, "Token is Invalid");
             }
             catch (Exception ex)
             {
@@ -53,15 +55,35 @@ namespace todoMMIS.Controllers
             }
         }
 
-        
+        [HttpPost("[controller]/[action]")]
+        public JsonResult ChangePass([FromBody] ChangePassModel data)
+        {
+            try
+            {
+                return Execute(GetToken(), (UserReplicate User) =>
+                {
+                    ApplicationContext.UserManager.ChangePassword(data,User);
+                    return Send(true, "Пароль сменен");
+                }, "Token is Invalid");
+            }
+            catch (Exception ex)
+            {
+                return Exception(ex);
+            }
+
+        }
+
+
         [HttpGet("[controller]/[action]")]
         public JsonResult Delete()
         {
             try
             {
-                UserReplicate user = ApplicationContext.UserManager.GetUser(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
-                ApplicationContext.UserManager.Delete(user.Id);
-                return Send(true, "Пользователь удален");
+                return Execute(GetToken(), (UserReplicate User) =>
+                {
+                    ApplicationContext.UserManager.Delete(User);
+                    return Send(true, "Пользователь удален");
+                }, "Token is Invalid");
             }
             catch(Exception ex)
             {

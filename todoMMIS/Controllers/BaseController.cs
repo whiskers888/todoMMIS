@@ -2,6 +2,7 @@
 using System.Dynamic;
 using todoMMIS.Contexts;
 using todoMMIS.Models;
+using todoMMIS.Replicates;
 using XAct;
 
 namespace todoMMIS.Controllers
@@ -41,17 +42,26 @@ namespace todoMMIS.Controllers
             return HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7);
         }
 
-        internal JsonResult Execute(string token, Func<string,JsonResult> action, string expMessage)
+        internal JsonResult Execute(string token, Func<string, JsonResult> action, string expMessage)
         {
             string Token = ApplicationContext.UserManager.FindToken(token);
+            UserReplicate User = ApplicationContext.UserManager.GetUser(token);
             if (Token != null)
             {
                 return action(Token);
             } 
             return Send(false, expMessage);
+        }
 
-
-
+        internal JsonResult Execute(string token, Func< UserReplicate, JsonResult> action, string expMessage)
+        {
+            string Token = ApplicationContext.UserManager.FindToken(token);
+            UserReplicate User = ApplicationContext.UserManager.GetUser(token);
+            if (Token != null)
+            {
+                return action(User);
+            }
+            return Send(false, expMessage);
         }
     }
 }

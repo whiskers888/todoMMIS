@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using System.Runtime.CompilerServices;
 using todoMMIS.Contexts;
 using todoMMIS.Models;
@@ -19,18 +20,21 @@ namespace todoMMIS.Controllers
         [HttpPost("[controller]/[action]")]
         public JsonResult Create([FromBody] EFTodo data)
         {
-            
             try
             {
-                data.User = ApplicationContext.DecodeToken(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
-                data.DateCreate = DateTime.Now.ToLocalTime();
-                TodoReplicate todos = ApplicationContext.TodoManager.Create(data);
+                return Execute(GetToken(), (User) =>
+                {
+                    data.User = User.Username;
+                    data.DateCreate = DateTime.Now.ToLocalTime();
+                    TodoReplicate todos = ApplicationContext.TodoManager.Create(data);
 
-                dynamic res = GetCommon();
-                res.items = todos;
-                res.msg = "Задача успешно создана";
-                return Send(true, res);
-            }catch(Exception ex)
+                    dynamic res = GetCommon();
+                    res.items = todos;
+                    res.msg = "Задача успешно создана";
+                    return Send(true, res);
+                }, "Token is Invalid");
+            }
+            catch(Exception ex)
             {
                 return Exception(ex);
             }
@@ -41,10 +45,12 @@ namespace todoMMIS.Controllers
             dynamic res = GetCommon();
             try
             {
-                string user = ApplicationContext.DecodeToken(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
-                TodoReplicate[] todos = ApplicationContext.TodoManager.GetAll(user).ToArray();
-                res.items = todos;
-                return Send(true, res);
+                return Execute(GetToken(), (User) =>
+                {
+                    TodoReplicate[] todos = ApplicationContext.TodoManager.GetAll(User.Username).ToArray();
+                    res.items = todos;
+                    return Send(true, res);
+                }, "Token is Invalid");
             }
             catch (Exception ex)
             {
@@ -58,12 +64,13 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                string user = ApplicationContext.DecodeToken(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
-                TodoReplicate todos = ApplicationContext.TodoManager.Get(id, user);
-
-                dynamic res = GetCommon();
-                res.items = todos;
-                return Send(true, res);
+                return Execute(GetToken(), (User) =>
+                {
+                    TodoReplicate todos = ApplicationContext.TodoManager.Get(id, User.Username);
+                    dynamic res = GetCommon();
+                    res.items = todos;
+                    return Send(true, res);
+                }, "Token is Invalid");
 
             }
             catch (Exception ex)
@@ -77,12 +84,16 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                data.User = ApplicationContext.DecodeToken(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
-                TodoReplicate UpdateData = ApplicationContext.TodoManager.Update(data);
+                return Execute(GetToken(), (User) =>
+                {
+                    data.User = User.Username;
 
-                dynamic res = GetCommon();
-                res.item = UpdateData;
-                return Send(true, res);
+                    TodoReplicate UpdateData = ApplicationContext.TodoManager.Update(data);
+
+                    dynamic res = GetCommon();
+                    res.item = UpdateData;
+                    return Send(true, res);
+                }, "Token is Invalid");
             }
             catch (Exception ex)
             {
@@ -95,20 +106,16 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                string user = ApplicationContext.DecodeToken(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
-                TodoReplicate replicate = ApplicationContext.TodoManager.Delete(id);
+                return Execute(GetToken(), (UserReplicate User) =>
+                {
+                    TodoReplicate todo = ApplicationContext.TodoManager.Get(id);
+                    TodoReplicate replicate = ApplicationContext.TodoManager.Delete(todo);
 
-                dynamic res = GetCommon();
-                if (replicate != null)
-                {
-                    res.msg = "Задача успешно удалена";
-                    return Send(true, res);
-                }
-                else
-                {
-                    res.msg = "Задачи с таким ID не существует";
+                    dynamic res = GetCommon();
+                    res.msg = replicate != null ? "Задача успешно удалена" : "Задачи с таким ID не существует";
                     return Send(false, res);
-                }
+
+                }, "Token is Invalid");
             }
             catch (Exception ex)
             {

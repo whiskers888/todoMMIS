@@ -13,12 +13,11 @@ namespace todoMMIS.Controllers
 
 
         [HttpPost("[controller]/[action]")]
-        public JsonResult SignIn([FromBody] dynamic data, bool remember)
+        public JsonResult SignIn([FromBody] EFUser data)
         {
             try
             {
-                dynamic userData = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(data.ToString());
-                UserReplicate user = ApplicationContext.UserManager.Authorize(userData["Username"].ToString(), userData["Password"].ToString(), Convert.ToBoolean(userData["Remember"]));
+                UserReplicate user = ApplicationContext.UserManager.Authorize(data.Username, data.Password);
                 var res = GetCommon();
                 res.item = user;
                 return Send(true, res);
@@ -63,8 +62,7 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                string token = GetToken();
-                return Execute(token, (access_token) =>
+                return Execute(GetToken(), (access_token) =>
                 {
                     ApplicationContext.UserManager.DeleteAuthorize(access_token);
                     var res = GetCommon();

@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using todoMMIS.Contexts;
 using todoMMIS.Models;
+using todoMMIS.Models.Новая_папка;
 using todoMMIS.Replicates;
 using XAct.Users;
 
@@ -9,16 +10,14 @@ namespace todoMMIS.Managers
 {
     public class UsersManager : BaseManager<UserReplicate, EFUser>
     {
-        private List<UserReplicate> Users { get; set; }
         public  List<string> Tokens { get; set; }
         public UsersManager(ApplicationContext appContext) : base(appContext)
         {
-            Users = new List<UserReplicate>();
-            Tokens = new List<string>();
         }
 
         public override void Read()
         {
+            Tokens = new List<string>();
             base.Read();
             foreach (UserReplicate replicate in replicates)
             {
@@ -29,11 +28,11 @@ namespace todoMMIS.Managers
             }
         }
 
-        public UserReplicate? Authorize(string login, string password, bool remember = false)
+        public UserReplicate? Authorize(string login, string password)
         {
             try
             {
-                UserReplicate user = Items.FirstOrDefault(x => x.Username == login & x.Password == AppContext.GetHash(password));
+                UserReplicate user = replicates.FirstOrDefault(x => x.Username == login & x.Password == AppContext.GetHash(password));
                 if (user != null)
                 {
                     user.Token = AppContext.GenerateToken(user.Username);
@@ -69,6 +68,25 @@ namespace todoMMIS.Managers
                 return null;
             }
         }
+
+        public override UserReplicate Update(EFUser model)
+        {
+            model.Username = null;
+            model.IsDeleted = null;
+            model.Token = null;
+            model.Password = null;
+
+            return base.Update(model);
+        }
+        public void ChangePassword(ChangePassModel data, UserReplicate user)
+        {
+            if(user.Password == AppContext.GetHash(data.OldPassword))
+            {
+                user.Context.Password = AppContext.GetHash(data.NewPassword);
+                base.Update(user.Context);
+            }
+        }
+
         public void DeleteAuthorize(string access_token)
         {
             UserReplicate user = GetUser(access_token);

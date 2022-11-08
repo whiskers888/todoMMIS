@@ -28,7 +28,7 @@ namespace todoMMIS.Managers
                 {
                     foreach (var item in items.ToArray())
                     {
-                        if(item.IsDeleted == false)
+                        if(item.IsDeleted == false | item.IsDeleted == null)
                         {
                             replicates.Add((TReplicate)Activator.CreateInstance(typeof(TReplicate), AppContext, item));
                         }
@@ -43,13 +43,14 @@ namespace todoMMIS.Managers
         {
             try
             {
+                EFModel.IsDeleted = false;
+                //Добавляем репликейт в свой список, а модель в БД и сохраняем
+                DBContext.Add(EFModel);
+                int a = DBContext.SaveChanges();
 
                 TReplicate replicate = (TReplicate)Activator.CreateInstance(typeof(TReplicate), AppContext, EFModel);
-
-                //Добавляем репликейт в свой список, а модель в БД и сохраняем
                 replicates.Add(replicate);
-                DBContext.Add(EFModel);
-                int  a = DBContext.SaveChanges();
+
                 return replicate;
             }
             catch (Exception ex)
@@ -60,14 +61,13 @@ namespace todoMMIS.Managers
             }
         }
 
-        public TReplicate Update(TModel model)
+        public virtual TReplicate Update(TModel model)
         {
             try
             {
                 // Обновляем репликейт
                 TReplicate replicate = Get(model.Id);
                 replicate.Update(model);
-
 
                 /*DBContext.Entry(model).State = EntityState.Modified;*/
                 DBContext.SaveChanges();
@@ -122,13 +122,13 @@ namespace todoMMIS.Managers
 
         }
 
-        public TReplicate Delete(int id)
+        public virtual TReplicate Delete(TReplicate replicate)
         {
             try
             {
                 foreach(TReplicate item in replicates)
                 {
-                    if(item.Id == id && item.IsDeleted == false)
+                    if(item.Id == replicate.Id && item.IsDeleted == false)
                     {
                         item.Context.IsDeleted = true;
                         Update((TModel)item.Context);

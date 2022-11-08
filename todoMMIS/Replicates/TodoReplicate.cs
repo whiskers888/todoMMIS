@@ -37,13 +37,13 @@ namespace todoMMIS.Replicates
             set => Context.IsExpired = value;
         }
 
-        public DateTime DateCreate
+        public DateTime? DateCreate
         {
             get => Context.DateCreate;
             set => Context.DateCreate = value;
         }
 
-        public DateTime DateExpired
+        public DateTime? DateExpired
         {
             get => Context.DateExpired;
             set => Context.DateExpired = value;
