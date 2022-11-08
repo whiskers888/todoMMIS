@@ -63,11 +63,14 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                string access_token = HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7);
-                var user = ApplicationContext.UserManager.GetUser(access_token);
-                ApplicationContext.UserManager.RemoveUser(user);
-                var res = GetCommon();
-                return Send(true, res);
+                string token = GetToken();
+                return Execute(token, (access_token) =>
+                {
+                    ApplicationContext.UserManager.DeleteAuthorize(access_token);
+                    var res = GetCommon();
+                    return Send(true, res);
+
+                }, "Token is Invalid");
             }
             catch (Exception ex)
             {

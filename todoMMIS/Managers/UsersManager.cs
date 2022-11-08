@@ -1,16 +1,32 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using todoMMIS.Contexts;
 using todoMMIS.Models;
 using todoMMIS.Replicates;
+using XAct.Users;
 
 namespace todoMMIS.Managers
 {
     public class UsersManager : BaseManager<UserReplicate, EFUser>
     {
         private List<UserReplicate> Users { get; set; }
+        public  List<string> Tokens { get; set; }
         public UsersManager(ApplicationContext appContext) : base(appContext)
         {
             Users = new List<UserReplicate>();
+            Tokens = new List<string>();
+        }
+
+        public override void Read()
+        {
+            base.Read();
+            foreach (UserReplicate replicate in replicates)
+            {
+                if (replicate.Token != null)
+                {
+                    Tokens.Add(replicate.Token);
+                }
+            }
         }
 
         public UserReplicate? Authorize(string login, string password, bool remember = false)
@@ -21,11 +37,8 @@ namespace todoMMIS.Managers
                 if (user != null)
                 {
                     user.Token = AppContext.GenerateToken(user.Username);
+                    AddToken(user.Token);
                     DBContext.SaveChanges();
-                    if (remember)
-                    {
-                        AddUser(user);
-                    }
                     return user;
                 }
                 return null;
@@ -44,7 +57,8 @@ namespace todoMMIS.Managers
                 {
                     User.Password = AppContext.GetHash(User.Password);
                     User.Token = AppContext.GenerateToken(User.Username);
-                    
+                    AddToken(User.Token);
+
 
                     return base.Create(User);
                 }
@@ -55,27 +69,28 @@ namespace todoMMIS.Managers
                 return null;
             }
         }
-        public void AddUser(UserReplicate user)
+        public void DeleteAuthorize(string access_token)
         {
-            if (Users.Contains(user) == false)
-            {
-                Users.Add(user);    
-            }
-        }
+            UserReplicate user = GetUser(access_token);
+            Tokens.Remove(access_token);
+            user.Context.Token = null;
+            Update(user.Context);
 
-        public void RemoveUser(UserReplicate user)
-        {
-            if (Users.Contains(user))
-            {
-                replicates.Remove(user);
-                Users.Remove(user); 
-                DeleteToken(user.Username);
-            }  
-        }
 
-        public void DeleteToken(string username)
+        }
+        public void AddToken(string Token)
         {
-            EFUser user = DBContext.Users.FirstOrDefault(x => x.Username == username);
+            Tokens.Add(Token);
+        }
+        public string FindToken(string Token)
+        {
+            string token = Tokens.FirstOrDefault(x => x == Token);
+            return token != null ? token : null;
+        }
+        public void DeleteToken(string Token)
+        {
+            string token = Tokens.FirstOrDefault(x => x == Token);
+            UserReplicate user = GetUser(token);
             user.Token = null;
             DBContext.Entry(user).State = EntityState.Modified;
                 DBContext.SaveChanges();
@@ -83,7 +98,7 @@ namespace todoMMIS.Managers
 
         public UserReplicate GetUser(string token)
         {
-            UserReplicate User = Items.FirstOrDefault(User => User.Token == token);
+            UserReplicate User = replicates.FirstOrDefault(User => User.Token == token);
             return User;
         } 
 

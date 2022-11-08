@@ -20,7 +20,7 @@ namespace todoMMIS.Managers
 
         public readonly List<TReplicate> replicates;
 
-        public void Read()
+        public virtual void Read()
         {
             foreach (var prop in DBContext.GetType().GetProperties())
             {

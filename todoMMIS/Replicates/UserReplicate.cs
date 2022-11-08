@@ -5,7 +5,7 @@ namespace todoMMIS.Replicates
 {
     public class UserReplicate : BaseReplicate
     {
-        protected EFUser Context { get; set; }
+        internal EFUser Context { get; set; }
         public UserReplicate(ApplicationContext app, EFUser _context) : base(app, _context)
         {
             Context = _context;
