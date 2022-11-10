@@ -3,6 +3,9 @@ using todoMMIS.Models;
 using todoMMIS.Contexts;
 using todoMMIS.Replicates;
 using XAct.Users;
+using System.Collections.Generic;
+using System;
+using System.Linq;
 
 namespace todoMMIS.Managers
 {
@@ -26,7 +29,7 @@ namespace todoMMIS.Managers
             {
                 if (prop.GetValue(DBContext) is DbSet<TModel> items)
                 {
-                    foreach (var item in items.ToArray())
+                    foreach (var item in  items.ToArray())
                     {
                         if(item.IsDeleted == false | item.IsDeleted == null)
                         {

@@ -1,4 +1,7 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -79,6 +82,6 @@ namespace todoMMIS.Contexts
         public const string AUDIENCE = "MyAuthClient"; // потребитель токена
         const string KEY = "mysupersecret_secretkey!123";   // ключ для шифрации
         public static SymmetricSecurityKey GetSymmetricSecurityKey() =>
-            new(Encoding.UTF8.GetBytes(KEY));
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(KEY));
     }
 }

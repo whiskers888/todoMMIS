@@ -11,31 +11,15 @@ namespace todoMMIS.Replicates
             Context = _context;
         }
 
-
-        public string FirstName
+        public string Name
         {
-            get => Context.FirstName;
-            set => Context.FirstName = value;
-        }
-        public string LastName
-        {
-            get => Context.LastName;
-            set => Context.LastName = value;
-        }
-        public string Patronymic
-        {
-            get => Context.Patronymic;
-            set => Context.Patronymic = value;
+            get => Context.Name;
+            set => Context.Name = value;
         }
         public string Username
         {
             get => Context.Username;
             set => Context.Username = value;
-        }
-        public string Email
-        {
-            get => Context.Email;
-            set => Context.Email = value;
         }
         public string Password
         {

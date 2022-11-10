@@ -1,4 +1,6 @@
-﻿namespace todoMMIS.Models
+﻿using System;
+
+namespace todoMMIS.Models
 {
     public class EFTodo : EFBaseModel
     {

@@ -9,8 +9,8 @@ namespace todoMMIS.Contexts
         public DbSet<EFUser> Users { get; set; }
         public DBContext(string cnnString)
         {
-            ConnectionString = cnnString;
-            /*Database.EnsureDeleted();
+            ConnectionString = cnnString;/*
+            Database.EnsureDeleted();*//*
             Database.EnsureCreated();*/
         }
 
