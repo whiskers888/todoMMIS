@@ -32,10 +32,14 @@ namespace todoMMIS.Controllers
             }); ; ;
         }
 
-        internal JsonResult Exception( Exception ex) 
+        internal JsonResult Exception(Exception ex)
         {
             dynamic res = GetCommon();
             res.Exception = ex.Message;
+            if (ex.InnerException != null)
+            {
+                res.InnerException = ex.InnerException.Message;
+            }
             return Send(false, res);
         }
         internal string GetToken()

@@ -67,19 +67,26 @@ namespace todoMMIS.Managers
                 return null;
             } catch (Exception ex)
             {
-                Console.WriteLine(ex.InnerException.Message);
-                return null;
+                throw;
             }
         }
 
         public override UserReplicate Update(EFUser model)
         {
-            model.Username = null;
-            model.IsDeleted = null;
-            model.Token = null;
-            model.Password = null;
+            try
+            {
+                model.Username = null;
+                model.IsDeleted = null;
+                model.Token = null;
+                model.Password = null;
 
-            return base.Update(model);
+                return base.Update(model);
+
+            }
+            catch
+            {
+                throw;
+            }
         }
         public void ChangePassword(ChangePassModel data, UserReplicate user)
         {
@@ -92,10 +99,17 @@ namespace todoMMIS.Managers
 
         public void DeleteAuthorize(string access_token)
         {
-            UserReplicate user = GetUser(access_token);
-            Tokens.Remove(access_token);
-            user.Context.Token = null;
-            Update(user.Context);
+            try
+            {
+                UserReplicate user = GetUser(access_token);
+                Tokens.Remove(access_token);
+                user.Context.Token = null;
+                base.Update(user.Context);
+            }
+            catch
+            {
+                throw;
+            }
 
 
         }
