@@ -1,4 +1,4 @@
-﻿namespace todoMMIS.Models.Новая_папка
+﻿namespace todoMMIS.Models.Responses
 {
     public class ChangePassModel
     {
