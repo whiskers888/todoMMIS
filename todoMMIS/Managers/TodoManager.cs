@@ -52,7 +52,7 @@ namespace todoMMIS.Managers
 
         public override TodoReplicate Update(EFTodo model)
         {
-            model.DateCreate = null;
+            model.createdAt = null;
             return base.Update(model);
         }
 

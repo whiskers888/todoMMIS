@@ -42,11 +42,5 @@ namespace todoMMIS.Replicates
             }
             
         }
-
-        public void Delete()
-        {
-            IsDeleted = true;
-            
-        }
     }
 }

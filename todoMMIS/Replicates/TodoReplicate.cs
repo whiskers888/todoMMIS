@@ -25,28 +25,28 @@ namespace todoMMIS.Replicates
             get => Context.User;
             set => Context.User = value;
         }
-        public bool IsComplete
+        public bool IsCompleted
         {
-            get => Context.IsComplete;
-            set => Context.IsComplete = value;
+            get => Context.IsCompleted;
+            set => Context.IsCompleted = value;
         }
 
         public bool IsExpired
         {
-            get => Context.IsExpired = DateTime.Now.ToLocalTime() >= DateExpired ? true : false;
+            get => Context.IsExpired = DateTime.Now.ToLocalTime() >= ExpiredAt ? true : false;
             set => Context.IsExpired = value;
         }
 
-        public DateTime? DateCreate
+        public DateTime? CreatedAt
         {
-            get => Context.DateCreate;
-            set => Context.DateCreate = value;
+            get => Context.createdAt;
+            set => Context.createdAt = value;
         }
 
-        public DateTime? DateExpired
+        public DateTime? ExpiredAt
         {
-            get => Context.DateExpired;
-            set => Context.DateExpired = value;
+            get => Context.expiredAt;
+            set => Context.expiredAt = value;
         }
         public int Priority
         {

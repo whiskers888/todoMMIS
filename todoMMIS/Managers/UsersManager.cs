@@ -71,16 +71,19 @@ namespace todoMMIS.Managers
             }
         }
 
-        public override UserReplicate Update(EFUser model)
+        public override UserReplicate Update(EFUser NewModel)
         {
             try
             {
-                model.Username = null;
-                model.IsDeleted = null;
-                model.Token = null;
-                model.Password = null;
+                UserReplicate replicate = Get(NewModel.Id);
 
-                return base.Update(model);
+                
+                NewModel.Username = replicate.Username;
+                NewModel.IsDeleted = replicate.IsDeleted;
+                NewModel.Token = replicate.Token;
+                NewModel.Password = replicate.Password;
+
+                return base.Update(NewModel);
 
             }
             catch

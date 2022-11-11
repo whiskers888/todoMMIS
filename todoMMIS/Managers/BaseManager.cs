@@ -103,28 +103,6 @@ namespace todoMMIS.Managers
            
         }
 
-        public List<TReplicate>? GetAll(int id)
-        {
-            try
-            {
-                List<TReplicate> ListReplicate = new List<TReplicate>();
-                foreach(TReplicate replicate in Items)
-                {
-                    if (replicate.Id == id )
-                    {
-                        ListReplicate.Add(replicate);
-                    }
-                }
-                return ListReplicate;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                throw;
-            }
-
-        }
-
         public virtual TReplicate Delete(TReplicate replicate)
         {
             try

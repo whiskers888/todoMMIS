@@ -26,7 +26,7 @@ namespace todoMMIS.Controllers
                 return Execute(GetToken(), (User) =>
                 {
                     data.User = User.Username;
-                    data.DateCreate = DateTime.Now.ToLocalTime();
+                    data.createdAt = DateTime.Now.ToLocalTime();
                     TodoReplicate todos = ApplicationContext.TodoManager.Create(data);
 
                     dynamic res = GetCommon();
