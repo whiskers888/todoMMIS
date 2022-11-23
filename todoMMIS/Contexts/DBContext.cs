@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using todoMMIS.Models;
+using todoMMIS.Models.EF;
 
 namespace todoMMIS.Contexts
 {

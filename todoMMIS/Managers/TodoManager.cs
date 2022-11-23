@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using todoMMIS.Contexts;
-using todoMMIS.Models;
+using todoMMIS.Models.EF;
 using todoMMIS.Replicates;
 
 namespace todoMMIS.Managers
 {
     public class TodoManager : BaseManager<TodoReplicate, EFTodo>
     {
-        public TodoManager(ApplicationContext app) : base(app) { }
+        public TodoManager (ApplicationContext app) : base(app) { }
 
         public List<TodoReplicate> Todos { get; set; }
 
@@ -33,7 +33,7 @@ namespace todoMMIS.Managers
             Todos = new List<TodoReplicate>();
             try
             {
-                foreach(TodoReplicate item in replicates)
+                foreach (TodoReplicate item in replicates)
                 {
                     if (item.User == username)
                     {
@@ -48,27 +48,6 @@ namespace todoMMIS.Managers
                 Console.WriteLine(ex.InnerException.Message);
                 return null;
             }
-        }
-
-        public override TodoReplicate Update(EFTodo model)
-        {
-            model.createdAt = null;
-            return base.Update(model);
-        }
-
-        public override TodoReplicate Delete(TodoReplicate replicate)
-        {
-            foreach(TodoReplicate item in replicates)
-            {
-                if(item.Id == replicate.Id && replicate.IsDeleted == false && item.User == replicate.User)
-                {
-                    item.Context.IsDeleted = true;
-                    Update((EFTodo)item.Context);
-                    replicates.Remove(item);
-                    return item;
-                }
-            }
-            return null;
         }
     }
 }

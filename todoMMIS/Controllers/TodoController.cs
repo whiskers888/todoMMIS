@@ -4,7 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Runtime.CompilerServices;
 using todoMMIS.Contexts;
-using todoMMIS.Models;
+using todoMMIS.Models.EF;
 using todoMMIS.Replicates;
 
 namespace todoMMIS.Controllers
@@ -14,7 +14,7 @@ namespace todoMMIS.Controllers
     {
 
        
-        public TodoController(ApplicationContext appContext) : base(appContext) { }
+        public TodoController (ApplicationContext appContext) : base(appContext) { }
 
         
 
@@ -23,7 +23,7 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                return Execute(GetToken(), (User) =>
+                return Execute((User) =>
                 {
                     data.User = User.Username;
                     data.createdAt = DateTime.Now.ToLocalTime();
@@ -46,7 +46,7 @@ namespace todoMMIS.Controllers
             dynamic res = GetCommon();
             try
             {
-                return Execute(GetToken(), (User) =>
+                return Execute((User) =>
                 {
                     TodoReplicate[] todos = ApplicationContext.TodoManager.GetAll(User.Username).ToArray();
                     res.items = todos;
@@ -65,7 +65,7 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                return Execute(GetToken(), (User) =>
+                return Execute((User) =>
                 {
                     TodoReplicate todos = ApplicationContext.TodoManager.Get(id, User.Username);
                     dynamic res = GetCommon();
@@ -85,7 +85,7 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                return Execute(GetToken(), (User) =>
+                return Execute((User) =>
                 {
                     data.User = User.Username;
 
@@ -107,7 +107,7 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                return Execute(GetToken(), (UserReplicate User) =>
+                return Execute((UserReplicate User) =>
                 {
                     TodoReplicate todo = ApplicationContext.TodoManager.Get(id);
                     TodoReplicate replicate = ApplicationContext.TodoManager.Delete(todo);

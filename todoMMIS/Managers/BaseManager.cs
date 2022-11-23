@@ -1,11 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using todoMMIS.Models;
 using todoMMIS.Contexts;
 using todoMMIS.Replicates;
 using XAct.Users;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using todoMMIS.Models.EF;
 
 namespace todoMMIS.Managers
 {
@@ -31,7 +31,7 @@ namespace todoMMIS.Managers
                 {
                     foreach (var item in  items.ToArray())
                     {
-                        if(item.IsDeleted == false | item.IsDeleted == null)
+                        if (item.IsDeleted == false | item.IsDeleted == null)
                         {
                             replicates.Add((TReplicate)Activator.CreateInstance(typeof(TReplicate), AppContext, item));
                         }
@@ -49,7 +49,7 @@ namespace todoMMIS.Managers
                 EFModel.IsDeleted = false;
                 //Добавляем репликейт в свой список, а модель в БД и сохраняем
                 DBContext.Add(EFModel);
-                int a = DBContext.SaveChanges();
+                DBContext.SaveChanges();
 
                 TReplicate replicate = (TReplicate)Activator.CreateInstance(typeof(TReplicate), AppContext, EFModel);
                 replicates.Add(replicate);
@@ -68,12 +68,12 @@ namespace todoMMIS.Managers
         {
             try
             {
+                DBContext.SaveChanges();
                 // Обновляем репликейт
                 TReplicate replicate = Get(model.Id);
                 replicate.Update(model);
 
                 /*DBContext.Entry(model).State = EntityState.Modified;*/
-                DBContext.SaveChanges();
                 return replicate;
 
             }catch(Exception ex)
@@ -95,7 +95,7 @@ namespace todoMMIS.Managers
                     }
                 }
                 return null;
-            }catch (Exception ex)
+            }catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 throw;
@@ -103,17 +103,17 @@ namespace todoMMIS.Managers
            
         }
 
-        public virtual TReplicate Delete(TReplicate replicate)
+        public TReplicate Delete(TReplicate replicate)
         {
             try
             {
-                foreach(TReplicate item in replicates)
+                foreach (TReplicate item in replicates)
                 {
-                    if(item.Id == replicate.Id && item.IsDeleted == false)
+                    if (item.Id == replicate.Id && item.IsDeleted == false)
                     {
                         item.Context.IsDeleted = true;
-                        Update((TModel)item.Context);
                         replicates.Remove(item);
+                        DBContext.SaveChanges();
                         return item;
                     }
                 }
@@ -124,6 +124,5 @@ namespace todoMMIS.Managers
                 throw;
             }
         }
-
     }
 }

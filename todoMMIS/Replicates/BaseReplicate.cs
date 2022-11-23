@@ -1,6 +1,6 @@
 ﻿using System;
 using todoMMIS.Contexts;
-using todoMMIS.Models;
+using todoMMIS.Models.EF;
 
 namespace todoMMIS.Replicates
 {
@@ -8,7 +8,7 @@ namespace todoMMIS.Replicates
     {
         internal EFBaseModel Context { get; set; }
         protected ApplicationContext App { get; }
-        public BaseReplicate(ApplicationContext _app, EFBaseModel _context)
+        public BaseReplicate (ApplicationContext _app, EFBaseModel _context)
         {
             App = _app;
             Context = _context;
@@ -28,7 +28,8 @@ namespace todoMMIS.Replicates
                 foreach (var key in items)
                 {
                     dynamic field = model.GetType().GetProperty(key.Name).GetValue(model);
-                    if (field != null && GetType().GetProperty(key.Name).GetValue(this) != field)
+                    dynamic value = GetType().GetProperty(key.Name).GetValue(this);
+                    if (field != null && value != field)
                     {
                         // Если ID будет пробовать поменять то надо проверить поле на сеттеры
                         GetType().GetProperty(key.Name).SetValue(this, field);

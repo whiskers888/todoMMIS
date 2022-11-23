@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using todoMMIS.Contexts;
-using todoMMIS.Models;
+using todoMMIS.Models.EF;
 using todoMMIS.Replicates;
 
 namespace todoMMIS.Controllers
@@ -10,7 +10,7 @@ namespace todoMMIS.Controllers
     public class AuthController : BaseController
     {
 
-        public AuthController(ApplicationContext _appContext) : base(_appContext) { }
+        public AuthController (ApplicationContext _appContext) : base(_appContext) { }
 
 
         [HttpPost("[controller]/[action]")]
@@ -63,7 +63,7 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                return Execute(GetToken(), (access_token) =>
+                return Execute((access_token) =>
                 {
                     ApplicationContext.UserManager.DeleteAuthorize(access_token);
                     var res = GetCommon();

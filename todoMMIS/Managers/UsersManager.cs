@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using todoMMIS.Contexts;
 using todoMMIS.Models;
-using todoMMIS.Models.Новая_папка;
+using todoMMIS.Models.EF;
 using todoMMIS.Replicates;
 using XAct.Users;
 
@@ -14,9 +15,7 @@ namespace todoMMIS.Managers
     public class UsersManager : BaseManager<UserReplicate, EFUser>
     {
         public  List<string> Tokens { get; set; }
-        public UsersManager(ApplicationContext appContext) : base(appContext)
-        {
-        }
+        public UsersManager (ApplicationContext appContext) : base(appContext) { }
 
         public override void Read()
         {
@@ -44,7 +43,7 @@ namespace todoMMIS.Managers
                     return user;
                 }
                 return null;
-            } catch (Exception ex)
+            }catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 Console.WriteLine(ex.InnerException.Message);
@@ -60,12 +59,10 @@ namespace todoMMIS.Managers
                     User.Password = AppContext.GetHash(User.Password);
                     User.Token = AppContext.GenerateToken(User.Username);
                     AddToken(User.Token);
-
-
                     return base.Create(User);
                 }
                 return null;
-            } catch (Exception ex)
+            }catch(Exception ex)
             {
                 throw;
             }
@@ -76,15 +73,11 @@ namespace todoMMIS.Managers
             try
             {
                 UserReplicate replicate = Get(NewModel.Id);
-
-                
                 NewModel.Username = replicate.Username;
                 NewModel.IsDeleted = replicate.IsDeleted;
                 NewModel.Token = replicate.Token;
                 NewModel.Password = replicate.Password;
-
                 return base.Update(NewModel);
-
             }
             catch
             {
@@ -93,7 +86,7 @@ namespace todoMMIS.Managers
         }
         public void ChangePassword(ChangePassModel data, UserReplicate user)
         {
-            if(user.Password == AppContext.GetHash(data.OldPassword))
+            if (user.Password == AppContext.GetHash(data.OldPassword))
             {
                 user.Context.Password = AppContext.GetHash(data.NewPassword);
                 base.Update(user.Context);
@@ -113,31 +106,29 @@ namespace todoMMIS.Managers
             {
                 throw;
             }
-
-
         }
         public void AddToken(string Token)
         {
             Tokens.Add(Token);
         }
+
         public string FindToken(string Token)
         {
-            string token = Tokens.FirstOrDefault(x => x == Token);
-            return token != null ? token : null;
+            return Tokens.FirstOrDefault(x => x == Token);
         }
+
         public void DeleteToken(string Token)
         {
             string token = Tokens.FirstOrDefault(x => x == Token);
             UserReplicate user = GetUser(token);
             user.Token = null;
             DBContext.Entry(user).State = EntityState.Modified;
-                DBContext.SaveChanges();
+            DBContext.SaveChanges();
         }
 
         public UserReplicate GetUser(string token)
         {
-            UserReplicate User = replicates.FirstOrDefault(User => User.Token == token);
-            return User;
+            return replicates.FirstOrDefault(User => User.Token == token);
         } 
 
     }

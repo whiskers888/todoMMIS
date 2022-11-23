@@ -1,4 +1,4 @@
-﻿namespace todoMMIS.Models
+﻿namespace todoMMIS.Models.EF
 {
     public class EFBaseModel
     {

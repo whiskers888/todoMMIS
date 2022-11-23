@@ -3,15 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using todoMMIS.Contexts;
 using todoMMIS.Models;
-using todoMMIS.Models.Новая_папка;
+using todoMMIS.Models.EF;
 using todoMMIS.Replicates;
 
 namespace todoMMIS.Controllers
 {
     [Authorize]
-    public class UserController:BaseController
+    public class UserController : BaseController
     {
-        public UserController(ApplicationContext _appContext) : base(_appContext) { }
+        public UserController (ApplicationContext _appContext) : base(_appContext) { }
 
         
         [HttpGet("[controller]/[action]")]
@@ -19,7 +19,7 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                return Execute(GetToken(), (UserReplicate User) =>
+                return Execute((UserReplicate User) =>
                 {
                     var res = GetCommon();
                     res.user = User;
@@ -39,7 +39,7 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                return Execute(GetToken(), (UserReplicate User) =>
+                return Execute((User) =>
                 {
                     data.Id = User.Id;
 
@@ -61,7 +61,7 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                return Execute(GetToken(), (UserReplicate User) =>
+                return Execute((User) =>
                 {
                     ApplicationContext.UserManager.ChangePassword(data,User);
                     return Send(true, "Пароль сменен");
@@ -80,7 +80,7 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                return Execute(GetToken(), (UserReplicate User) =>
+                return Execute((User) =>
                 {
                     ApplicationContext.UserManager.Delete(User);
                     return Send(true, "Пользователь удален");

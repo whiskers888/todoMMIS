@@ -8,10 +8,10 @@ using XAct;
 
 namespace todoMMIS.Controllers
 {
-    public class BaseController: Controller
+    public class BaseController : Controller
     {
         public ApplicationContext ApplicationContext { get; }
-        public BaseController(ApplicationContext appContext)
+        public BaseController (ApplicationContext appContext)
         {
             ApplicationContext = appContext;
         }
@@ -47,23 +47,22 @@ namespace todoMMIS.Controllers
             return HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7);
         }
 
-        internal JsonResult Execute(string token, Func<string, JsonResult> action, string expMessage)
+        internal JsonResult Execute(Func<string, JsonResult> action, string expMessage)
         {
-            string Token = ApplicationContext.UserManager.FindToken(token);
-            UserReplicate User = ApplicationContext.UserManager.GetUser(token);
-            if (Token != null)
+            string token = ApplicationContext.UserManager.FindToken(GetToken());
+            if (token != null)
             {
-                return action(Token);
+                return action(token);
             } 
             return Send(false, expMessage);
         }
 
-        internal JsonResult Execute(string token, Func< UserReplicate, JsonResult> action, string expMessage)
+        internal JsonResult Execute(Func< UserReplicate, JsonResult> action, string expMessage)
         {
-            string Token = ApplicationContext.UserManager.FindToken(token);
-            UserReplicate User = ApplicationContext.UserManager.GetUser(token);
-            if (Token != null)
+            string token = ApplicationContext.UserManager.FindToken(GetToken());
+            if (token != null)
             {
+                UserReplicate User = ApplicationContext.UserManager.GetUser(token);
                 return action(User);
             }
             return Send(false, expMessage);

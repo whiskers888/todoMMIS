@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using todoMMIS.Contexts;
-using todoMMIS.Models;
+using todoMMIS.Models.EF;
 
 namespace todoMMIS.Replicates
 {
     public class TodoReplicate : BaseReplicate
     {
         protected EFTodo Context { get; set; }
-        public TodoReplicate(ApplicationContext app, EFTodo _context) : base(app, _context)
+        public TodoReplicate (ApplicationContext app, EFTodo _context) : base(app, _context)
         {
             Context = _context;
         }
-
         public string TaskDescription
         {
             get => Context.TaskDescription;
@@ -30,20 +29,17 @@ namespace todoMMIS.Replicates
             get => Context.IsCompleted;
             set => Context.IsCompleted = value;
         }
-
         public bool IsExpired
         {
-            get => Context.IsExpired = DateTime.Now.ToLocalTime() >= ExpiredAt ? true : false;
+            get => Context.IsExpired = DateTime.Now.ToLocalTime() >= expiredAt ? true : false;
             set => Context.IsExpired = value;
         }
-
-        public DateTime? CreatedAt
+        public DateTime? createdAt
         {
             get => Context.createdAt;
             set => Context.createdAt = value;
         }
-
-        public DateTime? ExpiredAt
+        public DateTime? expiredAt
         {
             get => Context.expiredAt;
             set => Context.expiredAt = value;
@@ -53,6 +49,5 @@ namespace todoMMIS.Replicates
             get => Context.Priority;
             set => Context.Priority = value;
         }
-
     }
 }

@@ -1,12 +1,12 @@
 ﻿using todoMMIS.Contexts;
-using todoMMIS.Models;
+using todoMMIS.Models.EF;
 
 namespace todoMMIS.Replicates
 {
     public class UserReplicate : BaseReplicate
     {
         internal EFUser Context { get; set; }
-        public UserReplicate(ApplicationContext app, EFUser _context) : base(app, _context)
+        public UserReplicate (ApplicationContext app, EFUser _context) : base(app, _context)
         {
             Context = _context;
         }
