@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using todoMMIS.Contexts;
+using todoMMIS.Managers;
 
 namespace todoMMIS
 {
