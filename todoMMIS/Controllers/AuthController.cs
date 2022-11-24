@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using todoMMIS.Contexts;
 using todoMMIS.Models;
 using todoMMIS.Replicates;
@@ -13,15 +14,16 @@ namespace todoMMIS.Controllers
 
 
         [HttpPost("[controller]/[action]")]
-        public JsonResult SignIn([FromBody] dynamic data, bool remember)
+        public JsonResult SignIn([FromBody] EFUser data)
         {
             try
             {
-                dynamic userData = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(data.ToString());
-                UserReplicate user = ApplicationContext.UserManager.Authorize(userData["Username"].ToString(), userData["Password"].ToString(), Convert.ToBoolean(userData["Remember"]));
-                var res = GetCommon();
-                res.item = user;
-                return Send(true, res);
+                
+                    UserReplicate user = ApplicationContext.UserManager.Authorize(data.Username, data.Password);
+                    var res = GetCommon();
+                    res.item = user;
+                    return Send(true, res);
+               
             }
             catch (Exception ex)
             {
@@ -34,12 +36,12 @@ namespace todoMMIS.Controllers
         {
             try
             {
-                UserReplicate user = ApplicationContext.UserManager.Create(data);
+                UserReplicate User = ApplicationContext.UserManager.Create(data);
                 var res = GetCommon();  
                 bool status;
-                if (user != null)
+                if (User != null)
                 {
-                    res.item = user;
+                    res.item = User;
                     status = true;
                 }
                 else
@@ -59,15 +61,19 @@ namespace todoMMIS.Controllers
 
         [Authorize]
         [HttpGet("[controller]/[action]")]
-        public JsonResult SignOut()
+        public new JsonResult SignOut()
         {
             try
             {
-                string access_token = HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7);
-                var user = ApplicationContext.UserManager.GetUser(access_token);
-                ApplicationContext.UserManager.RemoveUser(user);
-                var res = GetCommon();
-                return Send(true, res);
+                return Execute(GetToken(),() =>
+                {
+                    string access_token = HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7);
+                    var user = ApplicationContext.UserManager.GetUser(access_token);
+                    ApplicationContext.UserManager.DeleteToken(access_token);
+                    var res = GetCommon();
+                    res.msg = "Goodbye";
+                    return Send(true, res);
+                }, "Token is invalid");
             }
             catch (Exception ex)
             {

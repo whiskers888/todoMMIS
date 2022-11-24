@@ -20,7 +20,7 @@ namespace todoMMIS.Managers
 
         public readonly List<TReplicate> replicates;
 
-        public void Read()
+        public virtual void Read()
         {
             foreach (var prop in DBContext.GetType().GetProperties())
             {
@@ -28,7 +28,7 @@ namespace todoMMIS.Managers
                 {
                     foreach (var item in items.ToArray())
                     {
-                        if(item.IsDeleted == false)
+                        if(item.IsDeleted == false )
                         {
                             replicates.Add((TReplicate)Activator.CreateInstance(typeof(TReplicate), AppContext, item));
                         }
@@ -49,13 +49,11 @@ namespace todoMMIS.Managers
                 //Добавляем репликейт в свой список, а модель в БД и сохраняем
                 replicates.Add(replicate);
                 DBContext.Add(EFModel);
-                int  a = DBContext.SaveChanges();
+                DBContext.SaveChanges();
                 return replicate;
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-                Console.WriteLine(ex.InnerException.Message);
                 throw;
             }
         }
@@ -69,13 +67,31 @@ namespace todoMMIS.Managers
                 replicate.Update(model);
 
 
-                /*DBContext.Entry(model).State = EntityState.Modified;*/
+                DBContext.Entry(model).State = EntityState.Modified;
                 DBContext.SaveChanges();
                 return replicate;
 
             }catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                throw;
+            }
+        }
+
+        public TReplicate Update(TModel model, TReplicate replicate)
+        {
+            try
+            {
+                // Обновляем репликейт
+                replicate.Update(model);
+
+
+                DBContext.Entry(model).State = EntityState.Modified;
+                DBContext.SaveChanges();
+                return replicate;
+
+            }
+            catch (Exception ex)
+            {
                 throw;
             }
         }
@@ -86,7 +102,7 @@ namespace todoMMIS.Managers
             {
                 foreach (TReplicate replicate in Items)
                 {
-                    if (replicate.Id == id )
+                    if (replicate.Id == id && replicate.IsDeleted == false)
                     {
                         return replicate;
                     }
@@ -107,7 +123,7 @@ namespace todoMMIS.Managers
                 List<TReplicate> ListReplicate = new List<TReplicate>();
                 foreach(TReplicate replicate in Items)
                 {
-                    if (replicate.Id == id )
+                    if (replicate.Id == id && replicate.IsDeleted == false)
                     {
                         ListReplicate.Add(replicate);
                     }
@@ -116,30 +132,22 @@ namespace todoMMIS.Managers
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
                 throw;
             }
 
         }
 
-        public TReplicate Delete(int id)
+        public virtual TReplicate Delete(int id)
         {
             try
             {
-                foreach(TReplicate item in replicates)
-                {
-                    if(item.Id == id && item.IsDeleted == false)
-                    {
-                        item.Context.IsDeleted = true;
-                        Update((TModel)item.Context);
-                        replicates.Remove(item);
-                        return item;
-                    }
-                }
-                return null;
+                TReplicate model = Get(id);
+                model.Context.IsDeleted = true;
+                Update((TModel)model.Context);
+                replicates.Remove(model);
+                return model;
             }catch(Exception ex)
             {
-                Console.WriteLine(ex.Message);
                 throw;
             }
         }

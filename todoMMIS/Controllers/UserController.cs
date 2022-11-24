@@ -36,9 +36,9 @@ namespace todoMMIS.Controllers
             try
             {
                 data.Username = null;
-                data.IsDeleted = null;
-                data.Token = null;
                 data.Password = null;
+                data.Token = null;
+                data.IsDeleted = null;
 
                 UserReplicate user = ApplicationContext.UserManager.GetUser(HttpContext.Request.Headers["Authorization"].ToString().Remove(0, 7));
                 data.Id = user.Id;

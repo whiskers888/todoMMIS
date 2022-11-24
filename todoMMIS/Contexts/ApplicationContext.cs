@@ -19,12 +19,14 @@ namespace todoMMIS.Contexts
 
         public void Initialize()
         {
-            TodoManager = new TodoManager(this);
+            TodoManager = new TodosManager(this);
             UserManager = new UsersManager(this);
+/*            TokensManager = new TokensManager(this);*/
         }
 
-        public TodoManager? TodoManager { get; set; }
-        public UsersManager? UserManager { get; set; }
+        public TodosManager TodoManager { get; set; }
+        public UsersManager UserManager { get; set; }
+/*        public TokensManager TokensManager { get; set; }*/
 
         public string Version { get; }
 
@@ -37,10 +39,16 @@ namespace todoMMIS.Contexts
             return new DBContext(Config.GetConnectionString("DefaultConnection"));
         }
 
-
+        public string GetHash(string input)
+        {
+            var tmpSource = Encoding.UTF8.GetBytes(input);
+            var hash = new MD5CryptoServiceProvider().ComputeHash(tmpSource);
+            return Convert.ToBase64String(hash);
+        }
         public string GenerateToken(string username)
         {
-            var claims = new List<Claim> { new Claim(ClaimTypes.Name, username) };
+            var handler = new JwtSecurityTokenHandler();
+            var claims = new List<Claim> { new Claim(ClaimTypes.Name, username), new Claim(ClaimTypes.Expired, DateTime.Now.AddDays(7).ToString())};
             var jwt = new JwtSecurityToken(
                     issuer: AuthOptions.ISSUER,
                     audience: AuthOptions.AUDIENCE,
@@ -48,10 +56,12 @@ namespace todoMMIS.Contexts
                     expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(10080)), // время действия 1 неделя
                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
 
-            return new JwtSecurityTokenHandler().WriteToken(jwt);
+            return handler.WriteToken(jwt);
         }
-        public string DecodeToken(string token)
+
+        public Dictionary<string, string> DecodeToken(string token)
         {
+            Dictionary<string, string> answer = new Dictionary<string, string>();
             var handler = new JwtSecurityTokenHandler();
             var validations = new TokenValidationParameters
             {
@@ -62,23 +72,11 @@ namespace todoMMIS.Contexts
                 ValidateAudience = true,
                 ValidAudience = AuthOptions.AUDIENCE,
             };
-            var claims = handler.ValidateToken(token, validations, out _);
+            var claims = handler.ValidateToken(token, validations, out var _);
+            answer.Add("User", claims.Identity.Name);
+            answer.Add("ExpireDate", claims.Identity.Expired);
             return claims.Identity.Name;
         }
-
-        public string GetHash(string input)
-        {
-            var tmpSource = Encoding.UTF8.GetBytes(input);
-            var hash = new MD5CryptoServiceProvider().ComputeHash(tmpSource);
-            return Convert.ToBase64String(hash);
-        }
     }
-    public class AuthOptions
-    {
-        public const string ISSUER = "MyAuthServer"; // издатель токена
-        public const string AUDIENCE = "MyAuthClient"; // потребитель токена
-        const string KEY = "mysupersecret_secretkey!123";   // ключ для шифрации
-        public static SymmetricSecurityKey GetSymmetricSecurityKey() =>
-            new(Encoding.UTF8.GetBytes(KEY));
-    }
+    
 }

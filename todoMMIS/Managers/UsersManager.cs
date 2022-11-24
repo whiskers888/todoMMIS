@@ -1,32 +1,37 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
+using System.Text;
 using todoMMIS.Contexts;
 using todoMMIS.Models;
 using todoMMIS.Replicates;
+using XAct;
 
 namespace todoMMIS.Managers
 {
     public class UsersManager : BaseManager<UserReplicate, EFUser>
     {
-        private List<UserReplicate> Users { get; set; }
-        public UsersManager(ApplicationContext appContext) : base(appContext)
-        {
-            Users = new List<UserReplicate>();
-        }
+        public UsersManager(ApplicationContext appContext) : base(appContext) { }
 
-        public UserReplicate? Authorize(string login, string password, bool remember = false)
+        public UserReplicate? Authorize(string login, string password)
         {
             try
             {
-                UserReplicate user = Items.FirstOrDefault(x => x.Username == login & x.Password == AppContext.GetHash(password));
-                if (user != null)
+                UserReplicate User = replicates.FirstOrDefault(x => x.Username == login & x.Password == AppContext.GetHash(password));
+                if (User != null)
                 {
-                    user.Token = AppContext.GenerateToken(user.Username);
-                    DBContext.SaveChanges();
-                    if (remember)
+                    User.Token = AppContext.GenerateToken(User.Username);
+
+                    EFToken token = AppContext.TokensManager.Create(new EFToken()
                     {
-                        AddUser(user);
-                    }
-                    return user;
+                        Token = User.Token,
+                        User = User.Username,
+                        IsDeleted = false,
+                    });
+                    DBContext.Add(token);
+
+                    DBContext.SaveChanges();
+                    return User;
                 }
                 return null;
             } catch (Exception ex)
@@ -44,9 +49,23 @@ namespace todoMMIS.Managers
                 {
                     User.Password = AppContext.GetHash(User.Password);
                     User.Token = AppContext.GenerateToken(User.Username);
-                    
+                    User.IsDeleted = false;
 
-                    return base.Create(User);
+                    UserReplicate replicateUser = (UserReplicate)Activator.CreateInstance(typeof(UserReplicate), AppContext, User);
+
+                    replicates.Add(replicateUser);
+                    DBContext.Add(User);
+
+                    EFToken token = AppContext.TokensManager.Create(new EFToken()
+                    {
+                        Token = User.Token,
+                        User = User.Username,
+                        IsDeleted = false,
+                    });
+                    DBContext.Add(token);
+
+                    DBContext.SaveChanges();
+                    return replicateUser;
                 }
                 return null;
             } catch (Exception ex)
@@ -55,37 +74,39 @@ namespace todoMMIS.Managers
                 return null;
             }
         }
-        public void AddUser(UserReplicate user)
-        {
-            if (Users.Contains(user) == false)
-            {
-                Users.Add(user);    
-            }
-        }
 
-        public void RemoveUser(UserReplicate user)
+        public override UserReplicate Delete(int id)
         {
-            if (Users.Contains(user))
-            {
-                replicates.Remove(user);
-                Users.Remove(user); 
-                DeleteToken(user.Username);
-            }  
-        }
-
-        public void DeleteToken(string username)
-        {
-            EFUser user = DBContext.Users.FirstOrDefault(x => x.Username == username);
+            UserReplicate user = Get(id);
+            AppContext.TokensManager.Delete(user.Token);
             user.Token = null;
-            DBContext.Entry(user).State = EntityState.Modified;
-                DBContext.SaveChanges();
+
+            Update(user.Context);
+
+            return base.Delete(id);
+        }
+
+        public void DeleteToken(string token)
+        {
+            UserReplicate user = replicates.FirstOrDefault(x => x.Token == token);
+            AppContext.TokensManager.Delete(user.Token);
+            user.Token = null;
+            DBContext.Entry(user.Context).State = EntityState.Modified;
+            DBContext.SaveChanges();
         }
 
         public UserReplicate GetUser(string token)
         {
-            UserReplicate User = Items.FirstOrDefault(User => User.Token == token);
+            UserReplicate? User = replicates.FirstOrDefault(User => User.Token == token);
             return User;
-        } 
-
+        }
+    }
+    public class AuthOptions
+    {
+        public const string ISSUER = "MyAuthServer"; // издатель токена
+        public const string AUDIENCE = "MyAuthClient"; // потребитель токена
+        const string KEY = "mysupersecret_secretkey!123";   // ключ для шифрации
+        public static SymmetricSecurityKey GetSymmetricSecurityKey() =>
+            new(Encoding.UTF8.GetBytes(KEY));
     }
 }
