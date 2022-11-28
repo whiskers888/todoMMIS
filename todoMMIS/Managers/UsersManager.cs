@@ -1,11 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using todoMMIS.Contexts;
-using todoMMIS.Models;
+using todoMMIS.Models.Answer;
 using todoMMIS.Models.EF;
 using todoMMIS.Replicates;
 using XAct.Users;
@@ -115,15 +112,6 @@ namespace todoMMIS.Managers
         public string FindToken(string Token)
         {
             return Tokens.FirstOrDefault(x => x == Token);
-        }
-
-        public void DeleteToken(string Token)
-        {
-            string token = Tokens.FirstOrDefault(x => x == Token);
-            UserReplicate user = GetUser(token);
-            user.Token = null;
-            DBContext.Entry(user).State = EntityState.Modified;
-            DBContext.SaveChanges();
         }
 
         public UserReplicate GetUser(string token)

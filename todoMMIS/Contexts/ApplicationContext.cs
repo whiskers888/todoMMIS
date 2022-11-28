@@ -53,21 +53,6 @@ namespace todoMMIS.Contexts
 
             return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
-        public string DecodeToken(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            var validations = new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = AuthOptions.GetSymmetricSecurityKey(),
-                ValidateIssuer = true,
-                ValidIssuer = AuthOptions.ISSUER,
-                ValidateAudience = true,
-                ValidAudience = AuthOptions.AUDIENCE,
-            };
-            var claims = handler.ValidateToken(token, validations, out _);
-            return claims.Identity.Name;
-        }
 
         public string GetHash(string input)
         {

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System;
 using todoMMIS.Contexts;
-using todoMMIS.Models;
+using todoMMIS.Models.Answer;
 using todoMMIS.Models.EF;
 using todoMMIS.Replicates;
 

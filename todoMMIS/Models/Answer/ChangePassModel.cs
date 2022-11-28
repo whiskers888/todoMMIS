@@ -1,4 +1,4 @@
-﻿namespace todoMMIS.Models
+﻿namespace todoMMIS.Models.Answer
 {
     public class ChangePassModel
     {

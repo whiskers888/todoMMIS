@@ -2,7 +2,7 @@
 using System;
 using System.Dynamic;
 using todoMMIS.Contexts;
-using todoMMIS.Models;
+using todoMMIS.Models.Answer;
 using todoMMIS.Replicates;
 using XAct;
 
@@ -24,7 +24,7 @@ namespace todoMMIS.Controllers
 
         internal JsonResult Send(bool status,object data)
         {
-            return Json(new Answer()
+            return Json(new Base()
             {
                 Status = status,
                 Data = data,

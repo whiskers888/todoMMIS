@@ -1,6 +1,6 @@
-﻿namespace todoMMIS.Models
+﻿namespace todoMMIS.Models.Answer
 {
-    public class Answer
+    public class Base
     {
         public object Data { get; set; }
         public bool Status { get; set; }
